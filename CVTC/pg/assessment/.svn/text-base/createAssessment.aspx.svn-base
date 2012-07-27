@@ -1,0 +1,36 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="createAssessment.aspx.cs" Inherits="pg_assessment_createAssessment" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <link href="../../css/global-style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <form id="form1" runat="server">
+    <br />
+    <table >
+         <tr>
+            <td style="width:150px">
+               Name of Assessment/Test: 
+               
+            </td>
+            <td style="width:130px">
+                <asp:TextBox ID="TextBoxAssessment" runat="server"></asp:TextBox>
+            </td>
+            <td style="width:60px">
+                <asp:Button ID="ButtonCreate" runat="server" Text="Create"  onclick="ButtonCreate_Click" />
+            </td>
+            <td style="width:350px">
+                <asp:Label ID="LabelMessage" runat="server" Text=""></asp:Label>
+                   <asp:RequiredFieldValidator ID="RequiredFieldValidatorAssessmentName" 
+                    runat="server" ErrorMessage="Please Put an assessment name" 
+                    ControlToValidate="TextBoxAssessment"></asp:RequiredFieldValidator>
+            </td>
+        </tr>
+ 
+    </table>
+    </form>
+</body>
+</html>

@@ -1,0 +1,337 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Collections.ObjectModel;
+using System.Text;
+using System.Data.Odbc;
+using System.Web.Script.Serialization;
+using System.Web.Services;
+
+
+public partial class pg_assessment_PrintResultLetter : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!Page.IsPostBack)
+        {
+            string aid = Request.QueryString["aid"].ToString();
+            if (!string.IsNullOrEmpty(Request.QueryString["mypid"]))
+            {
+                string rlst = Request.QueryString["mypid"] as string;
+                PrintIntervention(Convert.ToInt32(aid), Convert.ToInt32(rlst));
+            }
+        }
+    }
+    public void PrintIntervention(int aid, int rlst)
+    {
+        try
+        {
+            Assessment ass = new Assessment();
+            ass = ass.GetAssessmentByOID(aid);
+
+            ResultLetterDetail letterDetail = null;
+            ResultLetter resultLetter = new ResultLetter();
+            resultLetter = resultLetter.GetResultLetterByAOID(aid);
+
+            Collection<Answer> answers = new Answer().GetAnswerByAOIDAndRLST(aid, rlst);
+
+
+            //Collection<Student> studentList = new Student().GetAllStudentByResultLetterSentTimes(rlst);
+            Collection<Student> studentList = new Collection<Student>();// new Student().GetAllStudentByResultLetterSentTimes(rlst);
+            foreach (Answer answer in answers)
+            {
+                //Student student = new Student();
+                Student student = new Student().GetStudentByStudentOID(answer.BannerID.ToString());
+                bool isContain = false;
+                foreach (Student std in studentList)
+                {
+                    if (student.StudentOID == std.StudentOID)
+                    {
+                        isContain = true;
+                    }
+                }
+                if (!isContain)
+                {
+                    studentList.Add(student);
+                }
+
+            }
+
+
+            bool updateStatus = new Student().UpdateAllStudentByResultLetterSentTimes(rlst);
+            
+            StringBuilder sb = new StringBuilder();
+            string dateStr = System.DateTime.Today.ToLongDateString();
+            foreach (Student student in studentList)
+            {
+                sb.Append("<table cellpadding='0' cellspacing='0'  style='page-break-after:always; width:90%; margin:0px 20px 0px 20px;' >");
+                
+                sb.Append("<tr>");
+                sb.Append("<td> " + dateStr + "</td>");
+                sb.Append("</tr>");
+
+                sb.Append("<tr>");
+                sb.Append("<td> <br/><br/>" + student.FullName + "</td>");
+                sb.Append("</tr>");
+
+                sb.Append("<tr>");
+                sb.Append("<td> " + student.AddressOne + "</td>");
+                sb.Append("</tr>");
+
+                sb.Append("<tr>");
+                sb.Append("<td> ");
+
+                sb.Append("<table cellpadding='0' cellspacing='0' style='width:100%;'>");
+                sb.Append("<tr>");
+                sb.Append("<td align='left'> ");
+
+                if (!string.IsNullOrEmpty(student.City))
+                {
+                    sb.Append(student.City);
+                }
+                if (!string.IsNullOrEmpty(student.State))
+                {
+                    sb.Append(", " + student.State);
+                }
+                if (!string.IsNullOrEmpty(student.ZIPCode))
+                {
+                    sb.Append(", " + student.ZIPCode);
+                }
+
+                sb.Append("</td> ");
+                sb.Append("<td align='right'> Student ID: " + student.StudentID + "</td>");
+                sb.Append("<tr>");
+                sb.Append("</table>");
+
+                sb.Append("</td>");
+                sb.Append("</tr>");
+
+                string studentFirstName = student.FullName;
+                if (!string.IsNullOrEmpty(studentFirstName))
+                {
+                    try
+                    {
+                        if (studentFirstName.Contains(','))
+                        {
+                            studentFirstName = studentFirstName.Split(',')[1];
+                        }
+                    }
+                    catch
+                    { }
+                }
+
+                sb.Append("<tr>");
+                sb.Append("<td><br/>Dear " + studentFirstName + ":</td>");
+                sb.Append("</tr>");
+
+                if (resultLetter != null)
+                {
+                    sb.Append("<tr>");
+                    sb.Append("<td><br/>" + resultLetter.Header + "<br/></td>");
+                    sb.Append("</tr>");
+                }
+
+                sb.Append("<tr>");
+                sb.Append("<td>");
+                sb.Append("<table cellpadding='0' cellspacing='0' style='width:100%;'>");
+                sb.Append("<tr>");
+                sb.Append("<td style='background:#d7d7d7; width:30%; border: thin solid #999; padding:10px;'>CATEGORY</td>");
+                sb.Append("<td style='background:#d7d7d7; width:70%; border: thin solid #999; padding:10px;'>DEFINITION</td>");
+                sb.Append("</tr>");
+
+                Collection<StudentRank> studentRankList = new StudentRank().GetStudentRankBySOIDandAOID(student.StudentOID, ass.AssessmentOID);
+
+                foreach (Section s in ass.SectionList)
+                {
+                    if (s.SectionName == "NoScore") continue;
+                    string definition = "", starValue = "";
+                    if (resultLetter != null)
+                    {
+                        if (resultLetter.LetterDetail != null)
+                        {
+                            var tmp = from detail in resultLetter.LetterDetail
+                                      where detail.SectionOID == s.SectionOID
+                                      select detail;
+                            letterDetail = tmp != null ? tmp.First() : null;
+                        }
+                    }
+
+                    sb.Append("<tr>");
+
+                    foreach (StudentRank SR in studentRankList)
+                    {
+                        if (SR.SectionOID == s.SectionOID)
+                        {
+                            if (SR.Rank < s.Flag)
+                            {
+                                starValue = " *";
+                                break;
+                            }
+                            else
+                            { starValue = ""; }
+                        }
+                    }
+
+                    sb.Append("<td style='width:30%; border: thin solid #999; padding:10px'>" + s.SectionName + starValue + "</td>");
+                    definition = (letterDetail != null) ? letterDetail.SectionDefinition : "";
+
+                    sb.Append("<td style='width:70%; border: thin solid #999; padding:10px; text-align:left;'>" + definition + "</td>");
+                    sb.Append("</tr>");
+                }
+                sb.Append("</table>");
+
+                if (resultLetter != null)
+                {
+                    sb.Append("<tr>");
+                    sb.Append("<td><br/>" + resultLetter.ShowAboveResult + "</td>");
+                    sb.Append("</tr>");
+                }
+
+ 
+                
+
+                sb.Append("</td>");
+                sb.Append("</tr>");
+                sb.Append("</table>");
+
+            }
+            //print_div1.InnerHtml = sb.ToString();
+            Response.Write(sb.ToString());
+
+
+
+            return;
+        }
+        catch (Exception ex)
+        {
+             
+        }
+    }
+    public void UpdateIntervention(int aid, int rlst)
+    {
+        try
+        {
+            Assessment ass = new Assessment();
+            ass = ass.GetAssessmentByOID(aid);
+
+            ResultLetterDetail letterDetail = null;
+            ResultLetter resultLetter = new ResultLetter();
+            resultLetter = resultLetter.GetResultLetterByAOID(aid);
+
+            Collection<Student> studentList = new Student().GetAllStudentByResultLetterSentTimes(rlst);
+            
+            
+            
+            StringBuilder sb = new StringBuilder();
+            string dateStr = System.DateTime.Today.ToString();
+            foreach (Student student in studentList)
+            {
+                sb.Append("<table cellpadding='0px' cellspacing='0px' style='width:100%; page-break-after: always; margin:0px 20px 0px 20px'>");
+
+                sb.Append("<tr>");
+                sb.Append("<td> " + dateStr + "</td>");
+                sb.Append("</tr>");
+
+                sb.Append("<tr>");
+                sb.Append("<td> " + student.FullName + "</td>");
+                sb.Append("</tr>");
+
+                sb.Append("<tr>");
+                sb.Append("<td> " + student.AddressOne + "</td>");
+                sb.Append("</tr>");
+
+                sb.Append("<tr>");
+                sb.Append("<td> " + student.AddressTwo + "</td>");
+                sb.Append("</tr>");
+
+                sb.Append("<tr>");
+                sb.Append("<td> " + student.AddressThree + "</td>");
+                sb.Append("</tr>");
+
+                sb.Append("<tr>");
+                sb.Append("<td align='right'> Student ID: " + student.StudentID + "</td>");
+                sb.Append("</tr>");
+
+                sb.Append("<tr>");
+                sb.Append("<td> Dear " + student.FirstName + ":</td>");
+                sb.Append("</tr>");
+
+                if (resultLetter != null)
+                {
+                    sb.Append("<tr>");
+                    sb.Append("<td>" + resultLetter.Header + "</td>");
+                    sb.Append("</tr>");
+                }
+
+                sb.Append("<tr>");
+                sb.Append("<td>");
+                sb.Append("<table cellpadding='0px' cellspacing='0px' style='width:100%;'>");
+                sb.Append("<tr>");
+                sb.Append("<td style='background-color:Gray; width:30%; border: thin solid #000000;'>CATEGORY</td>");
+                sb.Append("<td style='background-color:Gray; width:70%; border: thin solid #000000;'>DEFINITION</td>");
+                sb.Append("</tr>");
+
+                Collection<StudentRank> studentRankList = new StudentRank().GetStudentRankBySOIDandAOID(student.StudentOID, ass.AssessmentOID);
+
+                foreach (Section s in ass.SectionList)
+                {
+                    string definition = "", starValue = "";
+                    if (resultLetter != null)
+                    {
+                        if (resultLetter.LetterDetail != null)
+                        {
+                            var tmp = from detail in resultLetter.LetterDetail
+                                      where detail.SectionOID == s.SectionOID
+                                      select detail;
+                            letterDetail = tmp != null ? tmp.First() : null;
+                        }
+                    }
+
+                    sb.Append("<tr>");
+
+                    foreach (StudentRank SR in studentRankList)
+                    {
+                        if (SR.SectionOID == s.SectionOID)
+                        {
+                            if (SR.Rank < s.Flag)
+                            {
+                                starValue = " *";
+                                break;
+                            }
+                            else
+                            { starValue = ""; }
+                        }
+                    }
+
+                    sb.Append("<td style='width:30%; border: thin solid #000000'>" + s.SectionName + starValue + "</td>");
+                    definition = (letterDetail != null) ? letterDetail.SectionDefinition : "";
+
+                    sb.Append("<td style='width:70%; border: thin solid #000000'>" + definition + "</td>");
+                    sb.Append("</tr>");
+                }
+                sb.Append("</table>");
+
+                if (resultLetter != null)
+                {
+                    sb.Append("<tr>");
+                    sb.Append("<td>" + resultLetter.ShowAboveResult + "</td>");
+                    sb.Append("</tr>");
+                }
+
+                sb.Append("</td>");
+                sb.Append("</tr>");
+                sb.Append("</table>");
+            }
+            //print_div1.InnerHtml = sb.ToString();
+            Response.Write(sb.ToString());
+            return;
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+}

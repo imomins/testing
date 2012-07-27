@@ -1,0 +1,156 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using System.Data.OleDb;
+using System.Data.SqlClient;
+
+
+public partial class pg_import_allerts : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!Page.IsPostBack)
+        {
+            // Initalize();
+            //ExcelImport();
+            // GridViewNTO.DataSource = ReadDryData(@"c:\test.xls");
+            //GridViewNTO.DataBind();
+        }
+    }
+
+
+    private void Init()
+    {
+
+
+    }
+
+
+    public System.Data.DataTable ReadDryData(string filename)
+    {
+        string connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + Server.MapPath(filename) + ";Extended Properties=Excel 12.0;";
+        string strSQL = "SELECT * FROM [Sheet1$]";
+        OleDbConnection excelConnection = new OleDbConnection(connectionString);
+        excelConnection.Open(); // this will open an Excel file
+        OleDbCommand dbCommand = new OleDbCommand(strSQL, excelConnection);
+        OleDbDataAdapter dataAdapter = new OleDbDataAdapter(dbCommand);
+        // create data table
+        System.Data.DataTable dTable = new System.Data.DataTable();
+        dataAdapter.Fill(dTable);
+
+        System.Data.DataTable dt = new System.Data.DataTable();
+        //dt = dTable.Copy();
+        //System.Data.DataRow nr;
+
+        for (int i = 0; i < dTable.Rows.Count; i++)
+        {
+            if (dTable.Rows[i]["BannerID"] == null || dTable.Rows[i]["BannerID"].ToString() == "")
+            {
+                dTable.Rows.Remove(dTable.Rows[i]);
+                i--;
+            }
+        }
+        
+        
+        dTable.Columns[1].ColumnName = "Type";
+        //string strConnection = @"Data Source=.\SQLEXPRESS; Initial Catalog=cvtc; User ID=cvtcuser; Password=cvtcuser";
+        string strConnection = System.Configuration.ConfigurationManager.ConnectionStrings["cvtcConnectionString"].ConnectionString;
+        SqlBulkCopy sqlBulk = new SqlBulkCopy(strConnection);
+        sqlBulk.DestinationTableName = "NTO";
+        sqlBulk.ColumnMappings.Add("BannerID", "BannerID");
+        sqlBulk.ColumnMappings.Add("Type", "Type");
+        sqlBulk.WriteToServer(dTable);
+
+        return dTable;
+    }
+    protected void Button1_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            uplTheFile.PostedFile.SaveAs(Server.MapPath("~/files/") + uplTheFile.Value);
+            string fileName = uplTheFile.Value;
+            string path = Server.MapPath("~/files/");
+            GridViewNTO.DataSource = GetCSVRows(path, fileName);
+            GridViewNTO.DataBind();
+        }
+        catch (Exception ex)
+        { }
+    }
+    protected void LinkButtonNTO_Click(object sender, EventArgs e)
+    {
+
+        Response.AppendHeader("Content-Disposition", "attachment; filename=ALLERTS.CSV");
+        Response.TransmitFile(Server.MapPath("~/file/ALLERTS.CSV"));
+        Response.End();
+    }
+    public static DataTable GetCSVRows(string path, string fName)
+    {
+        string header = "No";
+        string sql = string.Empty;
+        DataTable dataTable = null;
+        string pathOnly = string.Empty;
+        string fileName = string.Empty;
+        bool IsFirstRowHeader = true;
+
+        try
+        {
+
+            pathOnly = path;
+            fileName = fName;
+
+            sql = @"SELECT * FROM [" + fileName + "]";
+
+            if (IsFirstRowHeader)
+            {
+                header = "Yes";
+            }
+
+            using (OleDbConnection connection = new OleDbConnection(
+                    @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + pathOnly +
+                    ";Extended Properties=\"Text;HDR=" + header + "\""))
+            {
+                using (OleDbCommand command = new OleDbCommand(sql, connection))
+                {
+                    using (OleDbDataAdapter adapter = new OleDbDataAdapter(command))
+                    {
+                        dataTable = new DataTable();
+                        //dataTable.Locale = CultureInfo.CurrentCulture;
+                        adapter.Fill(dataTable);
+
+                        for (int i = 0; i < dataTable.Rows.Count; i++)
+                        {
+                            if (dataTable.Rows[i]["BannerID"] == null || dataTable.Rows[i]["BannerID"].ToString() == "")
+                            {
+                                dataTable.Rows.Remove(dataTable.Rows[i]);
+                                i--;
+                            }
+                        }
+
+
+
+                        dataTable.Columns[1].ColumnName = "Type";
+                        //string strConnection = @"Data Source=.\SQLEXPRESS; Initial Catalog=cvtc; User ID=cvtcuser; Password=cvtcuser";
+                        //string strConnection = System.Web.Configuration.WebConfigurationManager.AppSettings["ConnectionString"].ToString();
+                        string strConnection = System.Configuration.ConfigurationManager.ConnectionStrings["cvtcConnectionString"].ConnectionString;
+                        SqlBulkCopy sqlBulk = new SqlBulkCopy(strConnection);
+                        sqlBulk.DestinationTableName = "NTO";
+                        sqlBulk.ColumnMappings.Add("BannerID", "BannerID");
+                        sqlBulk.ColumnMappings.Add("Type", "Type");
+                        sqlBulk.WriteToServer(dataTable);
+
+                    }
+                }
+            }
+        }
+        finally
+        {
+
+        }
+
+        return dataTable;
+    }
+}

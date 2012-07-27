@@ -1,0 +1,863 @@
+﻿<%@ WebHandler Language="C#" Class="StudentHandler" %>
+
+using System;
+using System.Web;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Data.SqlClient;
+using System.Web.Script.Serialization;
+using System.Data.Odbc;
+using System.Web.SessionState;
+
+public class StudentHandler : IHttpHandler, IReadOnlySessionState
+{
+
+    string connectionString = "";   //@"Data Source=AETHER\SQLEXPRESS; Initial Catalog=cvtc; User ID=cvtcuser; Password=cvtcuser";
+    public void ProcessRequest (HttpContext context) 
+    {
+        connectionString = System.Web.Configuration.WebConfigurationManager.AppSettings["ConnectionString"].ToString();
+
+        HttpRequest request = context.Request;
+        HttpResponse response = context.Response;
+        string _search = request["_search"];
+        
+        string numberOfRows = request["rows"];
+        string pageIndex = request["page"];
+        string sortColumnName = request["sidx"];
+        string sortOrderBy = request["sord"];
+        string operation = request["oper"];
+        string field = request["searchField"];
+        string val = request["searchString"];
+
+        string reportname = request["reportname"];
+        string hiddenfields = request["hiddenfields"];
+        string spparams = request.RawUrl.ToString();
+        //string gridcolumns = request["gridcolumns"];
+        string isreport = request["isreport"];
+        if (isreport == "yes")
+        {
+            _search = "true";
+        }
+        
+ 
+
+        if ((!string.IsNullOrEmpty(reportname)) && (reportname != ""))
+        {
+            string[] stringSeparatorsasc = new string[] { "&sord=asc" };
+            string[] stringSeparatorsdesc = new string[] { "&sord=desc" };
+
+            if (spparams.Contains("&sord=asc"))
+            {
+                spparams = spparams.Split(stringSeparatorsasc, StringSplitOptions.None)[1];
+            }
+            else if (spparams.Contains("&sord=desc"))
+            {
+                spparams = spparams.Split(stringSeparatorsdesc, StringSplitOptions.None)[1];
+            }
+            else
+            {
+                spparams = "";
+            }
+
+            bool status = InsertSearchStudentReport(reportname, spparams, hiddenfields);
+        }
+        else if (_search == "true")
+        {
+            int totalRecords;
+            Collection<Student> students = SearchStudent(reportname, numberOfRows, pageIndex, sortColumnName, sortOrderBy, out totalRecords, Convert.ToInt32("0"), request["NAME"], request["StudentOID"], request["TERM"], request["FullPart"], Convert.ToDouble(request["GPA"]), Convert.ToDouble(request["CreditAttempted"]), Convert.ToDouble(request["EarnedCredit"]), request["Prealgebra"], request["Algebra"], request["Writting"], request["Reading"], request["English"], request["Math"], request["ReadingScore"], request["ScienceScore"], Convert.ToDateTime(request["TestingDate"]), request["HighSchool"], Convert.ToDateTime(request["HS_GRAD_DATE"]), request["ADDR1"], request["ADDR2"], request["ADDR3"], request["CITY"], request["STATE"], request["ZIP"], Convert.ToDateTime(request["ImportDate"]), request["PPGMIND"], request["MAJOR"], request["Email"], request["Phone"]);
+            string output = BuildJQGridResults(students, Convert.ToInt32(numberOfRows), Convert.ToInt32(pageIndex), Convert.ToInt32(totalRecords));
+            response.Write(output);
+
+            //Add data to Session variable
+            context.Session["StudentReportDt"] = this.ConvertListToDataTable(students);            
+        }
+        else if (operation == "edit")
+        {
+            UpdateStudent(Convert.ToInt32(request["id"]), request["NAME"], request["BID"], request["TERM"], request["FullPart"], Convert.ToDouble(request["GPA"].ToString()), Convert.ToDouble(request["CreditAttempted"]), Convert.ToDouble(request["EarnedCredit"]), request["Prealgebra"], request["Algebra"], request["Writting"], request["Reading"], request["English"], request["Math"], request["ReadingScore"], request["ScienceScore"], Convert.ToDateTime(request["TestingDate"]), request["HighSchool"], Convert.ToDateTime(request["HS_GRAD_DATE"]), request["Phone"], request["ADDR1"], request["ADDR2"], request["ADDR3"], request["CITY"], request["STATE"], request["ZIP"], request["Email"], Convert.ToDateTime(request["ImportDate"]), request["PPGMIND"], request["MAJOR"] );
+        }
+        else
+        {
+            int totalRecords;
+            Collection<Student> student = GetAllStudent(numberOfRows, pageIndex, sortColumnName, sortOrderBy, out totalRecords);
+            string output = BuildJQGridResults(student, Convert.ToInt32(numberOfRows), Convert.ToInt32(pageIndex), Convert.ToInt32(totalRecords));
+
+            response.Write(output);
+        }
+    }
+ 
+    public bool IsReusable {
+        get {
+            return false;
+        }
+    }
+
+
+    private DataTable ConvertListToDataTable(Collection<Student> students)
+    {
+        DataTable dt = new DataTable();
+        try
+        {
+
+            dt.Columns.Add("StudentOID");
+            dt.Columns.Add("NAME");
+            dt.Columns.Add("BID");
+            dt.Columns.Add("TERM");
+            dt.Columns.Add("FullPart");
+            dt.Columns.Add("GPA");
+            dt.Columns.Add("CreditAttempted");
+            dt.Columns.Add("EarnedCredit");
+            dt.Columns.Add("Prealgebra");
+            dt.Columns.Add("Algebra");
+            dt.Columns.Add("Writting");
+            dt.Columns.Add("Reading");
+            dt.Columns.Add("English");
+            dt.Columns.Add("Math");
+            dt.Columns.Add("ReadingScore");
+            dt.Columns.Add("ScienceScore");
+            dt.Columns.Add("TestingDate");
+            dt.Columns.Add("HighSchool");
+            dt.Columns.Add("HS_GRAD_DATE");
+            dt.Columns.Add("Phone");
+            dt.Columns.Add("ADDR1");
+            dt.Columns.Add("ADDR2");
+            dt.Columns.Add("ADDR3");
+            dt.Columns.Add("CITY");
+            dt.Columns.Add("STATE");
+            dt.Columns.Add("ZIP");
+            dt.Columns.Add("Email");
+            dt.Columns.Add("ImportDate");
+            dt.Columns.Add("PPGMIND");
+            dt.Columns.Add("MAJOR");       
+ 
+            foreach (Student student in students)
+            {
+                DataRow row = dt.NewRow();
+
+                row["StudentOID"]= student.StudentOID.ToString();
+                row["NAME"]= student.FullName;
+                row["BID"]= student.StudentID;
+                row["TERM"]= student.ProgramEnrollment;
+                row["FullPart"]= student.TimeIndicator;
+                row["GPA"]= student.CumulativeGPA.ToString();
+                row["CreditAttempted"]= student.CreditAttempted.ToString();
+                row["EarnedCredit"]= student.CreditEarned.ToString();
+                row["Prealgebra"]= student.PrealgebraTestScore;
+                row["Algebra"]= student.CompassalgebraTestScore;
+                row["Writting"] = student.CompassWrittingTestScore;
+                row["Reading"] = student.CompassReadingTestScore;
+                row["English"] = student.EnglishAssessmentScore;
+                row["Math"] = student.MathAssessmentScore;
+                row["ReadingScore"] = student.ReadingAssessmentScore;
+                row["ScienceScore"] = student.ScienceAssessmentScore;
+
+                row["TestingDate"] = student.LatestTestingDate.ToShortDateString();
+                row["HighSchool"] = student.HighSchoolName;
+                row["HS_GRAD_DATE"] = student.HighSchoolGraduationDate.ToShortDateString();
+                row["Phone"] = student.HomeTelephoneNumber;
+                row["ADDR1"] = student.AddressOne;
+                row["ADDR2"] = student.AddressTwo;
+                row["ADDR3"] = student.AddressThree;
+                row["CITY"] = student.City;
+
+                row["STATE"] = student.State;
+                row["ZIP"] = student.ZIPCode;
+                row["Email"] = student.EmailAddress;
+                row["ImportDate"] = student.ImportDate.ToShortDateString();
+                row["PPGMIND"] = student.PreprogramIndicator;
+                row["MAJOR"] = student.MajorProgramEnrollment;
+                 
+                dt.Rows.Add(row);
+            }
+            return dt;
+        }
+        catch (Exception ex)
+        {
+            return dt;
+        }
+    }
+        
+    private void UpdateStudent(int StudentOID, string BannerStudentName, string BannerStudentIDNumber, string TermCodeofProgramEnrollment, string FullTimeOrPartTimeIndicator, double CumulativeGPA, double CreditsAttempted, double CreditsEarned, string LatestCompassPrealgebraTestScore, string LatestCompassAlgebraTestScore, string LatestCompassWritingTestScore, string LatestCompassReadingTestScore, string LatestACTEnglishAssessmentScore, string LatestACTMathAssessmentScore, string LatestACTReadingAssessmentScore, string LatestACTScienceAssessmentScore, DateTime LatestTestingDate, string HighSchoolName, DateTime HighSchoolGraduationDate, string HomeTelephoneNumber, string MailingAddressLineOne, string MailingAddressLineTwo, string MailingAddressLineThree, string City, string StateName, string ZipCode, string EmailAddress, DateTime ImportDateFileCreationDate, string PreprogramIndicator, string MajorProgramEnrollmentName)
+    {
+        try
+        { 
+            Student std=new Student();
+            //assign
+            std.StudentOID=StudentOID;
+            std.StudentID=BannerStudentIDNumber;
+            std.FullName=BannerStudentName;
+            std.ProgramEnrollment=TermCodeofProgramEnrollment;
+            std.TimeIndicator=FullTimeOrPartTimeIndicator;
+            std.CumulativeGPA=CumulativeGPA;
+            std.CreditAttempted=CreditsAttempted;
+            std.CreditEarned=CreditsEarned;
+            std.PrealgebraTestScore=LatestCompassPrealgebraTestScore;
+            std.CompassalgebraTestScore=LatestCompassAlgebraTestScore;
+            std.CompassReadingTestScore=LatestCompassReadingTestScore;
+            std.CompassWrittingTestScore=LatestCompassWritingTestScore;
+            std.EnglishAssessmentScore=LatestACTEnglishAssessmentScore;
+            std.MathAssessmentScore=LatestACTMathAssessmentScore;
+            std.ReadingAssessmentScore=LatestACTReadingAssessmentScore;
+            std.ScienceAssessmentScore=LatestACTScienceAssessmentScore;
+            std.LatestTestingDate=LatestTestingDate;
+            std.HighSchoolName=HighSchoolName;
+            std.HighSchoolGraduationDate=HighSchoolGraduationDate;
+            std.HomeTelephoneNumber=HomeTelephoneNumber;
+            std.AddressOne=MailingAddressLineOne;
+            std.AddressThree=MailingAddressLineThree;
+            std.AddressTwo=MailingAddressLineTwo;
+            std.City=City;
+            std.State=StateName;
+            std.ZIPCode=ZipCode;
+            std.ImportDate=ImportDateFileCreationDate;
+            std.EmailAddress=EmailAddress;
+            std.PreprogramIndicator=PreprogramIndicator;
+            std.MajorProgramEnrollment=MajorProgramEnrollmentName;
+            
+            
+            std.UpdateStudent(std);
+        }
+        catch
+        ( Exception ex)
+        {}
+
+
+    }
+    
+    private Collection<Student> GetAllStudent(string numberOfRows, string pageIndex, string sortColumnName, string sortOrderBy, out int totalRecords)
+    {
+       
+        Collection<Student> students = new Collection<Student>();
+        using (OdbcConnection connection = new OdbcConnection(connectionString))
+        {
+            using (OdbcCommand command = new OdbcCommand())
+            {
+
+                command.Connection = connection;
+                command.CommandText = "{CALL Student_SelectjqGrid(?,?,?,?,?)}";
+                command.CommandType = CommandType.StoredProcedure;
+
+                OdbcParameter paramPageIndex = new OdbcParameter("@PageIndex", OdbcType.Int);
+                paramPageIndex.Value = Convert.ToInt32(pageIndex);
+                command.Parameters.Add(paramPageIndex);
+
+                OdbcParameter paramColumnName = new OdbcParameter("@SortColumnName", OdbcType.VarChar, 50);
+                paramColumnName.Value = sortColumnName;
+                command.Parameters.Add(paramColumnName);
+
+                OdbcParameter paramSortorderBy = new OdbcParameter("@SortOrderBy", OdbcType.VarChar, 4);
+                paramSortorderBy.Value = sortOrderBy;
+                command.Parameters.Add(paramSortorderBy);
+
+                OdbcParameter paramNumberOfRows = new OdbcParameter("@NumberOfRows", OdbcType.Int);
+                paramNumberOfRows.Value = Convert.ToInt32(numberOfRows);
+                command.Parameters.Add(paramNumberOfRows);
+
+                OdbcParameter paramTotalRecords = new OdbcParameter("@TotalRecords", OdbcType.Int);
+                totalRecords = 0;
+                paramTotalRecords.Value = totalRecords;
+                paramTotalRecords.Direction = ParameterDirection.Output;
+                command.Parameters.Add(paramTotalRecords);
+
+                connection.Open();
+                using (OdbcDataReader dataReader = command.ExecuteReader())
+                {
+                    Student student;
+                    while (dataReader.Read())
+                    {
+                        student = new Student();
+                        student.StudentOID = Convert.ToInt32(dataReader["StudentOID"]);
+                        if (dataReader["BannerStudentName"] != null)
+                        {
+                            student.FullName = Convert.ToString(dataReader["BannerStudentName"]);
+  
+                        }
+
+                        if (dataReader["BannerStudentIDNumber"] != null)
+                        {
+                            student.StudentID = Convert.ToString(dataReader["BannerStudentIDNumber"]);
+                        }
+                        if (dataReader["TermCodeofProgramEnrollment"] != null)
+                        {
+                            student.ProgramEnrollment = Convert.ToString(dataReader["TermCodeofProgramEnrollment"]);
+                        }
+                        if (dataReader["FullTimeOrPartTimeIndicator"] != null)
+                        {
+                            student.TimeIndicator = Convert.ToString(dataReader["FullTimeOrPartTimeIndicator"]);
+                        }
+                        if (dataReader["CumulativeGPA"] != null)
+                        {
+                            student.CumulativeGPA = Convert.ToDouble(dataReader["CumulativeGPA"]);
+                        }
+                        if (dataReader["CreditsAttempted"] != null)
+                        {
+                            student.CreditAttempted = Convert.ToDouble(dataReader["CreditsAttempted"]);
+                        }
+                        if (dataReader["CreditsEarned"] != null)
+                        {
+                            student.CreditEarned = Convert.ToDouble(dataReader["CreditsEarned"]);
+                        }
+                        if (dataReader["LatestCompassPrealgebraTestScore"] != null)
+                        {
+                            student.PrealgebraTestScore = Convert.ToString(dataReader["LatestCompassPrealgebraTestScore"]);
+                        }
+                        if (dataReader["LatestCompassAlgebraTestScore"] != null)
+                        {
+                            student.CompassalgebraTestScore = Convert.ToString(dataReader["LatestCompassAlgebraTestScore"]);
+                        }
+                        if (dataReader["LatestCompassWritingTestScore"] != null)
+                        {
+                            student.CompassWrittingTestScore = Convert.ToString(dataReader["LatestCompassWritingTestScore"]);
+                        }
+                        if (dataReader["LatestCompassReadingTestScore"] != null)
+                        {
+                            student.CompassReadingTestScore = Convert.ToString(dataReader["LatestCompassReadingTestScore"]);
+                        }
+                        if (dataReader["LatestACTEnglishAssessmentScore"] != null)
+                        {
+                            student.EnglishAssessmentScore = Convert.ToString(dataReader["LatestACTEnglishAssessmentScore"]);
+                        }
+                        if (dataReader["LatestACTMathAssessmentScore"] != null)
+                        {
+                            student.MathAssessmentScore = Convert.ToString(dataReader["LatestACTMathAssessmentScore"]);
+                        }
+                        if (dataReader["LatestACTReadingAssessmentScore"] != null)
+                        {
+                            student.ReadingAssessmentScore = Convert.ToString(dataReader["LatestACTReadingAssessmentScore"]);
+                        }
+                        if (dataReader["LatestACTScienceAssessmentScore"] != null)
+                        {
+                            student.ScienceAssessmentScore = Convert.ToString(dataReader["LatestACTScienceAssessmentScore"]);
+                        }
+                        if (dataReader["LatestTestingDate"] != null && dataReader["LatestTestingDate"] != DBNull.Value)
+                        {
+                            
+                            student.LatestTestingDate = Convert.ToDateTime(dataReader["LatestTestingDate"]);
+                        }
+                        if (dataReader["HighSchoolName"] != null)
+                        {
+                            student.HighSchoolName = Convert.ToString(dataReader["HighSchoolName"]);
+                        }
+                        if (dataReader["HighSchoolGraduationDate"] != null)
+                        {
+                            student.HighSchoolGraduationDate = Convert.ToDateTime(dataReader["HighSchoolGraduationDate"]);
+                        }
+                        if (dataReader["HomeTelephoneNumber"] != null)
+                        {
+                            student.HomeTelephoneNumber = Convert.ToString(dataReader["HomeTelephoneNumber"]);
+                        }
+                        if (dataReader["MailingAddressLineOne"] != null)
+                        {
+                            student.AddressOne = Convert.ToString(dataReader["MailingAddressLineOne"]);
+                        }
+                        if (dataReader["MailingAddressLineTwo"] != null)
+                        {
+                            student.AddressTwo = Convert.ToString(dataReader["MailingAddressLineTwo"]);
+                        }
+                        if (dataReader["MailingAddressLineThree"] != null)
+                        {
+                            student.AddressThree = Convert.ToString(dataReader["MailingAddressLineThree"]);
+                        }
+                        if (dataReader["City"] != null)
+                        {
+                            student.City = Convert.ToString(dataReader["City"]);
+                        }
+                        if (dataReader["StateName"] != null)
+                        {
+                            student.State = Convert.ToString(dataReader["StateName"]);
+                        }
+                        if (dataReader["ZipCode"] != null)
+                        {
+                            student.ZIPCode = Convert.ToString(dataReader["ZipCode"]);
+                        }
+                        if (dataReader["EmailAddress"] != null)
+                        {
+                            student.EmailAddress = Convert.ToString(dataReader["EmailAddress"]);
+                        }
+                        if (dataReader["ImportDateFileCreationDate"] != null)
+                        {
+                            student.ImportDate = Convert.ToDateTime(dataReader["ImportDateFileCreationDate"]);
+                        }
+                        if (dataReader["PreprogramIndicator"] != null)
+                        {
+                            student.PreprogramIndicator = Convert.ToString(dataReader["PreprogramIndicator"]);
+                        }
+                        if (dataReader["MajorProgramEnrollmentName"] != null)
+                        {
+                            student.MajorProgramEnrollment = Convert.ToString(dataReader["MajorProgramEnrollmentName"]);
+                        }
+                        student.FileCreatedDate = Convert.ToDateTime(dataReader["FileCreationDate"]);
+                        students.Add(student);
+
+                    }
+                }
+                totalRecords = (int)paramTotalRecords.Value;
+            }
+
+            return students;
+        }
+    }
+
+    private Collection<Student> SearchStudent(string reportname, string numberOfRows, string pageIndex, string sortColumnName, string sortOrderBy, out int totalRecords, int StudentOID, string NAME, string ID, string TERM, string PFIND, double GPA, double ATMPCR, double EARNCR, string C1, string C2, string CW, string CR, string AE, string AM, string AR, string SA, DateTime SDATE, string HSDESC, DateTime HS_GRAD_DATE, string ADDR1, string ADDR2, string ADDR3, string CITY, string STATE, string ZIP, DateTime FILEDATE, string PPGMIND, string MAJOR, string Email, string Phone)
+    {
+        StudentOID = (StudentOID.ToString() == null) ? StudentOID : StudentOID;
+        NAME = (NAME == null) ? "" : NAME;
+        ID = (ID == null) ? "" : ID;
+        TERM = (TERM == null) ? "" : TERM;
+        PFIND = (PFIND == null) ? "" : PFIND;
+        GPA = (GPA.ToString() == null) ? GPA : GPA;
+
+        ATMPCR = (ATMPCR.ToString() == null) ? ATMPCR : ATMPCR;
+        EARNCR = (EARNCR.ToString() == null) ? EARNCR : EARNCR;
+        C1 = (C1 == null) ? "" : C1;
+        C2 = (C2 == null) ? "" : C2;
+        CW = (CW == null) ? "" : CW;
+        CR = (CR == null) ? "" : CR;
+
+        AE = (AE == null) ? "" : AE;
+        AM = (AM == null) ? "" : AM;
+        AR = (AR == null) ? "" : AR;
+        SA = (SA == null) ? "" : SA;
+        SDATE = (SDATE == Convert.ToDateTime("1/1/0001")) ? Convert.ToDateTime("1/1/1900") : SDATE;
+        HSDESC = (HSDESC == null) ? "" : HSDESC;
+
+        HS_GRAD_DATE = (HS_GRAD_DATE == Convert.ToDateTime("1/1/0001")) ? Convert.ToDateTime("1/1/1900") : HS_GRAD_DATE;
+        ADDR1 = (ADDR1 == null) ? "" : ADDR1;
+        ADDR2 = (ADDR2 == null) ? "" : ADDR2;
+        ADDR3 = (ADDR3 == null) ? "" : ADDR3;
+        CITY = (CITY == null) ? "" : CITY;
+        STATE = (STATE == null) ? "" : STATE;
+
+        ZIP = (ZIP == null) ? "" : ZIP;
+        FILEDATE = (FILEDATE == Convert.ToDateTime("1/1/0001")) ? Convert.ToDateTime("1/1/1900") : FILEDATE;
+        PPGMIND = (PPGMIND == null) ? "" : PPGMIND;
+        MAJOR = (MAJOR == null) ? "" : MAJOR;
+        Email = (Email == null) ? "" : Email;
+        Phone = (Phone == null) ? "" : Phone;
+        //FileCreateDate = (FileCreateDate == null) ? Convert.ToDateTime("1/1/1900") : FileCreateDate;
+
+
+       
+        
+        
+        //This code for searching
+
+        Collection<Student> students = new Collection<Student>();
+        using (OdbcConnection connection = new OdbcConnection(connectionString))
+        {
+            using (OdbcCommand command = new OdbcCommand())
+            {
+
+                command.Connection = connection;
+                command.CommandText = "{CALL Student_Search(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+                command.CommandType = CommandType.StoredProcedure;
+
+                //OdbcParameter paramStudentOID = new OdbcParameter("@StudentOID", OdbcType.Int, 10);
+                //paramStudentOID.Value = StudentOID;
+                //command.Parameters.Add(paramStudentOID);
+
+                OdbcParameter paramNAME = new OdbcParameter("@NAME", OdbcType.VarChar, 100);
+                paramNAME.Value = NAME;
+                command.Parameters.Add(paramNAME);
+
+                OdbcParameter paramID = new OdbcParameter("@ID", OdbcType.VarChar, 100);
+                paramID.Value = ID;
+                command.Parameters.Add(paramID);
+
+                OdbcParameter paramTERM = new OdbcParameter("@TERM", OdbcType.VarChar, 100);
+                paramTERM.Value = TERM;
+                command.Parameters.Add(paramTERM);
+
+                OdbcParameter paramPFIND = new OdbcParameter("@PFIND", OdbcType.VarChar, 100);
+                paramPFIND.Value = PFIND;
+                command.Parameters.Add(paramPFIND);
+
+                OdbcParameter paramGPA = new OdbcParameter("@GPA", OdbcType.VarChar, 15);//5
+                paramGPA.Value = GPA;
+                command.Parameters.Add(paramGPA);
+
+                OdbcParameter paramATMPCR = new OdbcParameter("@ATMPCR", OdbcType.VarChar, 15);
+                paramATMPCR.Value = ATMPCR;
+                command.Parameters.Add(paramATMPCR);
+
+                OdbcParameter paramEARNCR = new OdbcParameter("@EARNCR", OdbcType.VarChar, 15);
+                paramEARNCR.Value = EARNCR;
+                command.Parameters.Add(paramEARNCR);
+
+                OdbcParameter paramC1 = new OdbcParameter("@C1", OdbcType.VarChar, 100);
+                paramC1.Value = C1;
+                command.Parameters.Add(paramC1);
+
+                OdbcParameter paramC2 = new OdbcParameter("@C2", OdbcType.VarChar, 100);
+                paramC2.Value = C2;
+                command.Parameters.Add(paramC2);
+
+                OdbcParameter paramCW = new OdbcParameter("@CW", OdbcType.VarChar, 100);//10
+                paramCW.Value = CW;
+                command.Parameters.Add(paramCW);
+
+                OdbcParameter paramCR = new OdbcParameter("@CR", OdbcType.VarChar, 100);
+                paramCR.Value = CR;
+                command.Parameters.Add(paramCR);
+
+                OdbcParameter paramAE = new OdbcParameter("@AE", OdbcType.VarChar, 100);
+                paramAE.Value = AE;
+                command.Parameters.Add(paramAE);
+
+                OdbcParameter paramAM = new OdbcParameter("@AM", OdbcType.VarChar, 100);
+                paramAM.Value = AM;
+                command.Parameters.Add(paramAM);
+
+                OdbcParameter paramAR = new OdbcParameter("@AR", OdbcType.VarChar, 100);
+                paramAR.Value = AR;
+                command.Parameters.Add(paramAR);
+
+                OdbcParameter paramSA = new OdbcParameter("@SA", OdbcType.VarChar, 100);//15
+                paramSA.Value = SA;
+                command.Parameters.Add(paramSA);
+
+                OdbcParameter paramSDATE = new OdbcParameter("@SDATE", OdbcType.DateTime);
+                paramSDATE.Value = SDATE;
+                command.Parameters.Add(paramSDATE);
+
+                OdbcParameter paramHSDESC = new OdbcParameter("@HSDESC", OdbcType.VarChar, 100);
+                paramHSDESC.Value = HSDESC;
+                command.Parameters.Add(paramHSDESC);
+
+                OdbcParameter paramHS_GRAD_DATE = new OdbcParameter("@HS_GRAD_DATE", OdbcType.DateTime);
+                paramHS_GRAD_DATE.Value = HS_GRAD_DATE;
+                command.Parameters.Add(paramHS_GRAD_DATE);
+
+                //
+                OdbcParameter paramHTNumber = new OdbcParameter("@HTNumber", OdbcType.VarChar, 20);
+                paramHTNumber.Value = Phone;
+                command.Parameters.Add(paramHTNumber);
+                //
+
+                OdbcParameter paramADDR1 = new OdbcParameter("@ADDR1", OdbcType.VarChar, 100);//20
+                paramADDR1.Value = ADDR1;
+                command.Parameters.Add(paramADDR1);
+
+                OdbcParameter paramADDR2 = new OdbcParameter("@ADDR2", OdbcType.VarChar, 100);
+                paramADDR2.Value = ADDR2;
+                command.Parameters.Add(paramADDR2);
+
+                OdbcParameter paramADDR3 = new OdbcParameter("@ADDR3", OdbcType.VarChar, 100);
+                paramADDR3.Value = ADDR3;
+                command.Parameters.Add(paramADDR3);
+
+                OdbcParameter paramCITY = new OdbcParameter("@CITY", OdbcType.VarChar, 100);
+                paramCITY.Value = CITY;
+                command.Parameters.Add(paramCITY);
+
+                OdbcParameter paramSTATE = new OdbcParameter("@STATE", OdbcType.VarChar, 100);
+                paramSTATE.Value = STATE;
+                command.Parameters.Add(paramSTATE);
+
+                OdbcParameter paramZIP = new OdbcParameter("@ZIP", OdbcType.VarChar, 100);//25
+                paramZIP.Value = ZIP;
+                command.Parameters.Add(paramZIP);
+
+                OdbcParameter paramEmail = new OdbcParameter("@Email", OdbcType.VarChar, 100);
+                paramEmail.Value = Email;
+                command.Parameters.Add(paramEmail);
+
+                OdbcParameter paramFILEDATE = new OdbcParameter("@FILEDATE", OdbcType.DateTime);
+                paramFILEDATE.Value = FILEDATE;
+                command.Parameters.Add(paramFILEDATE);
+
+                //OdbcParameter paramFileCreateDate = new OdbcParameter("@FileCreateDate", OdbcType.DateTime);
+                //paramFileCreateDate.Value = FILEDATE;
+                //command.Parameters.Add(paramFileCreateDate);
+
+                OdbcParameter paramPPGMIND = new OdbcParameter("@PPGMIND", OdbcType.VarChar, 100);
+                paramPPGMIND.Value = PPGMIND;
+                command.Parameters.Add(paramPPGMIND);
+
+                OdbcParameter paramMAJOR = new OdbcParameter("@MAJOR", OdbcType.VarChar, 100);
+                paramMAJOR.Value = MAJOR;
+                command.Parameters.Add(paramMAJOR);
+
+                OdbcParameter paramPageIndex = new OdbcParameter("@PageIndex", OdbcType.Int);//30
+                paramPageIndex.Value = Convert.ToInt32(pageIndex);
+                command.Parameters.Add(paramPageIndex);
+
+                OdbcParameter paramColumnName = new OdbcParameter("@SortColumnName", OdbcType.VarChar, 50);
+                paramColumnName.Value = sortColumnName;
+                command.Parameters.Add(paramColumnName);
+
+                OdbcParameter paramSortorderBy = new OdbcParameter("@SortOrderBy", OdbcType.VarChar, 4);
+                paramSortorderBy.Value = sortOrderBy;
+                command.Parameters.Add(paramSortorderBy);
+
+                OdbcParameter paramNumberOfRows = new OdbcParameter("@NumberOfRows", OdbcType.Int);
+                paramNumberOfRows.Value = Convert.ToInt32(numberOfRows);
+                command.Parameters.Add(paramNumberOfRows);
+
+                OdbcParameter paramTotalRecords = new OdbcParameter("@TotalRecords", OdbcType.Int);
+                totalRecords = 0;
+                paramTotalRecords.Value = totalRecords;
+                paramTotalRecords.Direction = ParameterDirection.Output;
+                command.Parameters.Add(paramTotalRecords);
+
+                connection.Open();
+                using (OdbcDataReader dataReader = command.ExecuteReader())
+                {
+                    Student student;
+                    while (dataReader.Read())
+                    {
+                        student = new Student();
+                        student.StudentOID = Convert.ToInt32(dataReader["StudentOID"]);
+                        if (dataReader["BannerStudentName"] != null)
+                        {
+                            student.FullName = Convert.ToString(dataReader["BannerStudentName"]);
+
+                        }
+
+                        if (dataReader["BannerStudentIDNumber"] != null)
+                        {
+                            student.StudentID = Convert.ToString(dataReader["BannerStudentIDNumber"]);
+                        }
+                        if (dataReader["TermCodeofProgramEnrollment"] != null)
+                        {
+                            student.ProgramEnrollment = Convert.ToString(dataReader["TermCodeofProgramEnrollment"]);
+                        }
+                        if (dataReader["FullTimeOrPartTimeIndicator"] != null)
+                        {
+                            student.TimeIndicator = Convert.ToString(dataReader["FullTimeOrPartTimeIndicator"]);
+                        }
+                        if (dataReader["CumulativeGPA"] != null)
+                        {
+                            student.CumulativeGPA = Convert.ToDouble(dataReader["CumulativeGPA"]);
+                        }
+                        if (dataReader["CreditsAttempted"] != null)
+                        {
+                            student.CreditAttempted = Convert.ToDouble(dataReader["CreditsAttempted"]);
+                        }
+                        if (dataReader["CreditsEarned"] != null)
+                        {
+                            student.CreditEarned = Convert.ToDouble(dataReader["CreditsEarned"]);
+                        }
+                        if (dataReader["LatestCompassPrealgebraTestScore"] != null)
+                        {
+                            student.PrealgebraTestScore = Convert.ToString(dataReader["LatestCompassPrealgebraTestScore"]);
+                        }
+                        if (dataReader["LatestCompassAlgebraTestScore"] != null)
+                        {
+                            student.CompassalgebraTestScore = Convert.ToString(dataReader["LatestCompassAlgebraTestScore"]);
+                        }
+                        if (dataReader["LatestCompassWritingTestScore"] != null)
+                        {
+                            student.CompassWrittingTestScore = Convert.ToString(dataReader["LatestCompassWritingTestScore"]);
+                        }
+                        if (dataReader["LatestCompassReadingTestScore"] != null)
+                        {
+                            student.CompassReadingTestScore = Convert.ToString(dataReader["LatestCompassReadingTestScore"]);
+                        }
+                        if (dataReader["LatestACTEnglishAssessmentScore"] != null)
+                        {
+                            student.EnglishAssessmentScore = Convert.ToString(dataReader["LatestACTEnglishAssessmentScore"]);
+                        }
+                        if (dataReader["LatestACTMathAssessmentScore"] != null)
+                        {
+                            student.MathAssessmentScore = Convert.ToString(dataReader["LatestACTMathAssessmentScore"]);
+                        }
+                        if (dataReader["LatestACTReadingAssessmentScore"] != null)
+                        {
+                            student.ReadingAssessmentScore = Convert.ToString(dataReader["LatestACTReadingAssessmentScore"]);
+                        }
+                        if (dataReader["LatestACTScienceAssessmentScore"] != null)
+                        {
+                            student.ScienceAssessmentScore = Convert.ToString(dataReader["LatestACTScienceAssessmentScore"]);
+                        }
+                        if (dataReader["LatestTestingDate"] != null)
+                        {
+                            student.LatestTestingDate = Convert.ToDateTime(dataReader["LatestTestingDate"]);
+                        }
+                        if (dataReader["HighSchoolName"] != null)
+                        {
+                            student.HighSchoolName = Convert.ToString(dataReader["HighSchoolName"]);
+                        }
+                        if (dataReader["HighSchoolGraduationDate"] != null)
+                        {
+                            student.HighSchoolGraduationDate = Convert.ToDateTime(dataReader["HighSchoolGraduationDate"]);
+                        }
+                        if (dataReader["HomeTelephoneNumber"] != null)
+                        {
+                            student.HomeTelephoneNumber = Convert.ToString(dataReader["HomeTelephoneNumber"]);
+                        }
+                        if (dataReader["MailingAddressLineOne"] != null)
+                        {
+                            student.AddressOne = Convert.ToString(dataReader["MailingAddressLineOne"]);
+                        }
+                        if (dataReader["MailingAddressLineTwo"] != null)
+                        {
+                            student.AddressTwo = Convert.ToString(dataReader["MailingAddressLineTwo"]);
+                        }
+                        if (dataReader["MailingAddressLineThree"] != null)
+                        {
+                            student.AddressThree = Convert.ToString(dataReader["MailingAddressLineThree"]);
+                        }
+                        if (dataReader["City"] != null)
+                        {
+                            student.City = Convert.ToString(dataReader["City"]);
+                        }
+                        if (dataReader["StateName"] != null)
+                        {
+                            student.State = Convert.ToString(dataReader["StateName"]);
+                        }
+                        if (dataReader["ZipCode"] != null)
+                        {
+                            student.ZIPCode = Convert.ToString(dataReader["ZipCode"]);
+                        }
+                        if (dataReader["EmailAddress"] != null)
+                        {
+                            student.EmailAddress = Convert.ToString(dataReader["EmailAddress"]);
+                        }
+                        if (dataReader["ImportDateFileCreationDate"] != null)
+                        {
+                            student.ImportDate = Convert.ToDateTime(dataReader["ImportDateFileCreationDate"]);
+                        }
+                        if (dataReader["PreprogramIndicator"] != null)
+                        {
+                            student.PreprogramIndicator = Convert.ToString(dataReader["PreprogramIndicator"]);
+                        }
+                        if (dataReader["MajorProgramEnrollmentName"] != null)
+                        {
+                            student.MajorProgramEnrollment = Convert.ToString(dataReader["MajorProgramEnrollmentName"]);
+                        }
+                        student.FileCreatedDate = Convert.ToDateTime(dataReader["FileCreationDate"]);
+                        students.Add(student);
+
+                    }
+                }
+                totalRecords = (int)paramTotalRecords.Value;
+            }
+
+            return students;
+        }
+    }
+
+
+    //private bool InsertSearchStudentReport(string reportname, string numberOfRows, string pageIndex, string sortColumnName, string sortOrderBy, out int totalRecords, int StudentOID, string NAME, string ID, string TERM, string PFIND, double GPA, double ATMPCR, double EARNCR, string C1, string C2, string CW, string CR, string AE, string AM, string AR, string SA, DateTime SDATE, string HSDESC, DateTime HS_GRAD_DATE, string ADDR1, string ADDR2, string ADDR3, string CITY, string STATE, string ZIP, DateTime FILEDATE, string PPGMIND, string MAJOR, string Email, string Phone)
+    private bool InsertSearchStudentReport(string reportname, string spparams, string gridcolumns)//, string numberOfRows, string pageIndex, string sortColumnName, string sortOrderBy, out int totalRecords, int StudentOID, string NAME, string ID, string TERM, string PFIND, double GPA, double ATMPCR, double EARNCR, string C1, string C2, string CW, string CR, string AE, string AM, string AR, string SA, DateTime SDATE, string HSDESC, DateTime HS_GRAD_DATE, string ADDR1, string ADDR2, string ADDR3, string CITY, string STATE, string ZIP, DateTime FILEDATE, string PPGMIND, string MAJOR, string Email, string Phone)
+    {
+            bool result = false;
+            
+            int reportOID = 0;
+            String ReportName = (reportname == null) ? "" : reportname;
+            String SPName = "";
+            String SPParams = (spparams == null) ? "" : spparams;
+            String GridColumns = (gridcolumns == null) ? "" : gridcolumns;  
+            DateTime CreatedDate = System.DateTime.Now;
+        
+            using (OdbcConnection connection = new OdbcConnection(connectionString))
+            {
+                using (OdbcCommand command = new OdbcCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandText = "{CALL Reports_Insert(?,?,?,?,?,?)}";
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    OdbcParameter returnParam = command.Parameters.Add("@ReportOID", OdbcType.Int);
+                    returnParam.Direction = ParameterDirection.ReturnValue;
+
+                    //command.Parameters.AddWithValue("@ReportOID",0);
+                    command.Parameters.AddWithValue("@ReportName", ReportName);
+                    command.Parameters.AddWithValue("@SPName", SPName);
+                    command.Parameters.AddWithValue("@SPParams", SPParams);
+                    command.Parameters.AddWithValue("@GridColumns", GridColumns);
+                    command.Parameters.AddWithValue("@CreatedDate", CreatedDate);
+
+                    connection.Open();
+                    int n = command.ExecuteNonQuery();
+                    if (n == 1)
+                        result = true;
+                    else
+                        result = false;
+                    if (result)
+                    {
+                        reportOID = (int)command.Parameters["@ReportOID"].Value;
+                        
+                        //To Insert menu
+                        CVTCMenu menu = new CVTCMenu();
+                        menu.NameMenu = ReportName;
+                        int menuId = new CVTCMenu().GetMaxMenuID();
+                        menuId += 1;
+                        menu.MenuID = menuId;
+                        menu.URL = "pg/student/studentreport.aspx?ReportOID=" + reportOID;
+                        menu.MenuLevel = 1;
+                        menu.Parent = 6;
+                        menu.IsExpanded = "true";
+                        menu.IsLeave = "true";
+                        menu.SaveAssessmentMenuItem(menu);                        
+                    }
+                    else
+                    {
+                        reportOID = 0;
+                    }
+                }
+            }
+        return true;
+    }
+    
+    
+    
+    
+    
+    
+        
+    private string BuildJQGridResults(Collection<Student> students, int numberOfRows, int pageIndex, int totalRecords)
+    {
+
+        JQGridResults result = new JQGridResults();
+        List<JQGridRow> rows = new List<JQGridRow>();
+        foreach (Student student in students)
+        {
+            JQGridRow row = new JQGridRow();
+            row.id = student.StudentOID ;
+            row.cell = new string[30];
+            row.cell[0] = student.StudentOID.ToString ();
+            row.cell[1] = student.FullName;
+            row.cell[2] = student.StudentID;
+            row.cell[3] = student.ProgramEnrollment;
+            row.cell[4] = student.TimeIndicator;
+            row.cell[5] = student.CumulativeGPA.ToString ();
+            row.cell[6] = student.CreditAttempted.ToString ();
+            row.cell[7] = student.CreditEarned.ToString ();
+            row.cell[8] = student.PrealgebraTestScore;
+            row.cell[9] = student.CompassalgebraTestScore;
+            row.cell[10] = student.CompassWrittingTestScore;
+            row.cell[11] = student.CompassReadingTestScore;
+            row.cell[12] = student.EnglishAssessmentScore;
+            row.cell[13] = student.MathAssessmentScore;
+            row.cell[14] = student.ReadingAssessmentScore;
+            row.cell[15] = student.ScienceAssessmentScore;
+
+            row.cell[16] = student.LatestTestingDate.ToShortDateString ();
+            row.cell[17] = student.HighSchoolName;
+            row.cell[18] = student.HighSchoolGraduationDate.ToShortDateString();
+            row.cell[19] = student.HomeTelephoneNumber;
+            row.cell[20] = student.AddressOne;
+            row.cell[21] = student.AddressTwo;
+            row.cell[22] = student.AddressThree;
+            row.cell[23] = student.City;
+
+            row.cell[24] = student.State;
+            row.cell[25] = student.ZIPCode;
+            row.cell[26] = student.EmailAddress;
+            row.cell[27] = student.ImportDate.ToShortDateString ();
+            row.cell[28] = student.PreprogramIndicator;
+            row.cell[29] = student.MajorProgramEnrollment;
+                                  
+            rows.Add(row);
+        }
+        result.rows = rows.ToArray();
+        result.page = pageIndex;
+        result.total = totalRecords / numberOfRows;
+        if (totalRecords % numberOfRows != 0) result.total += 1;
+        result.records = totalRecords;
+        return new JavaScriptSerializer().Serialize(result);
+    }
+    
+}

@@ -1,0 +1,70 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="home.aspx.cs" Inherits="pg_answer_home" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Untitled Page</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <table style="width: 100%;">
+        <tr style="background-color:#85B5D9">
+            <td colspan="3" >
+                Please Provide Information given Below
+            </td>
+            
+        </tr>
+        <tr>
+            <td>
+                BannerID
+            </td>
+            <td>
+                <asp:TextBox ID="TextBoxBannerID" runat="server"></asp:TextBox>
+            </td>
+            <td>
+                <asp:RequiredFieldValidator ID="RequiredFieldValidatorBannerID" runat="server" 
+                    ErrorMessage="Please input Banner ID" ControlToValidate="TextBoxBannerID"></asp:RequiredFieldValidator>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Last Name
+            </td>
+            <td>
+                <asp:TextBox ID="TextBoxLastName" runat="server"></asp:TextBox>
+            </td>
+            <td>
+                <asp:RequiredFieldValidator ID="RequiredFieldValidatorLastName" runat="server" 
+                    ErrorMessage="Please input Last Name" ControlToValidate="TextBoxLastName"></asp:RequiredFieldValidator>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                First Name
+            </td>
+            <td>
+                <asp:TextBox ID="TextBoxFirstName" runat="server"></asp:TextBox>
+            </td>
+            <td>
+                <asp:RequiredFieldValidator ID="RequiredFieldValidatorFirstName" runat="server" 
+                    ErrorMessage="Please input first name" 
+                    ControlToValidate="TextBoxFirstName"></asp:RequiredFieldValidator>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                
+            </td>
+            <td>
+                <asp:Button ID="ButtonSubmit" runat="server" Text="Submit" 
+                    onclick="ButtonSubmit_Click" />
+            </td>
+            <td>
+                <asp:Label ID="LabelMsg" runat="server" ForeColor="#FF3300"></asp:Label>
+            </td>
+        </tr>
+    </table>
+    </form>
+</body>
+</html>

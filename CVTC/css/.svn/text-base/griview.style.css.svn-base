@@ -1,0 +1,65 @@
+﻿.mGrid
+{
+	width: 100%;
+	color: #1D59AD;
+	background-color: #fff;
+	margin: 5px 0 10px 0;
+	border-color:#79B7E7;
+  
+	 font-family: Lucida Grande,Lucida Sans,Arial,sans-serif;
+
+    
+}
+.mGrid tr
+{
+	padding: 2px;
+	border-color:#79B7E7;
+	/*border: solid 1px #79B7E7;*/
+	color: #1D59AD;
+	font-size: 11px;
+	
+}
+.mGrid tr:hover
+{
+	 background:#cc3ff;
+}
+.mGrid th
+{
+
+	color: #1D59AD;
+	background: #DDECF7;
+	border-left: solid 1px #79B7E7;
+	 font-family: Lucida Grande,Lucida Sans,Arial,sans-serif;
+	font-size: 13px;
+}
+.mGrid .alt
+{
+	background: #fcfcfc url(grd_alt.png) repeat-x top;
+}
+.mGrid .pgr
+{
+	background: #424242 url(grd_pgr.png) repeat-x top;
+}
+.mGrid .pgr table
+{
+	margin: 5px 0;
+}
+.mGrid .pgr td
+{
+	border-width: 0;
+	padding: 0 6px;
+	border-color:#79B7E7;
+	font-weight: bold;
+	color: #fff;
+	line-height: 12px;
+}
+.mGrid .pgr a
+{
+	color: #666;
+	text-decoration: none;
+}
+.mGrid .pgr a:hover
+{
+	color: #000;
+	text-decoration: none;
+}

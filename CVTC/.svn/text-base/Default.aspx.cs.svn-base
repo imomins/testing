@@ -1,0 +1,57 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Xml;
+
+public partial class _Default : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!Page.IsPostBack)
+        {
+            Initialization();
+        }
+    }
+
+    private void Initialization()
+    {
+        try
+        {
+            if (Session["CurrentUser"] != null)
+            {
+                User u = (User)Session["CurrentUser"];
+                LabelUserName.Text = u != null ? u.LastName + ", " + u.FirstName : "";
+                LabelUserName.Text += "[" + DateTime.Now.ToString()+"]";
+            }
+        }
+        catch (Exception ex)
+        { }
+    }
+
+    [System.Web.Services.WebMethod]
+    public static string GetXML()
+    {
+        //XmlTextReader reader = new XmlTextReader(
+        //@"c:\tree.xml");
+
+        //reader.WhitespaceHandling = WhitespaceHandling.None;
+        //XmlDocument xmlDoc = new XmlDocument();
+        ////Load the file into the XmlDocument
+
+        //xmlDoc.Load(reader);
+        ////Close off the connection to the file.
+
+        //reader.Close();
+
+        //return xmlDoc;
+
+        string str="";
+
+    
+        return str;
+
+    }
+}

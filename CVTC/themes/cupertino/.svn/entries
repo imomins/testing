@@ -1,0 +1,31 @@
+8
+
+dir
+94
+http://aether/svn/cvtc/trunk/themes/cupertino
+http://aether/svn/cvtc
+
+
+
+2011-06-06T10:34:11.218750Z
+2
+anisuzzaman
+
+
+svn:special svn:externals svn:needs-lock
+
+images
+dir
+
+theme.css
+file
+
+
+
+
+2011-03-19T13:00:40.000000Z
+75af90efddd8605614dc043ad644d513
+2011-06-06T10:34:11.218750Z
+2
+anisuzzaman
+

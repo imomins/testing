@@ -1,0 +1,179 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="login.aspx.cs" Inherits="login" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CVTC</title>
+<script type="text/javascript" src="js/jquery.js"></script>
+<link href="css/jquery-ui-1.8.1.custom.css" rel="stylesheet" type="text/css" />
+<link href="css/global-style.css" rel="stylesheet" type="text/css" />
+    <link href="css/login-style.css" rel="stylesheet" type="text/css" />
+   <script type="text/javascript">
+     $(document).ready(function() {
+          
+            $("#Buttonlg").click(function() {            
+                $("#<%=ButtonLogin.ClientID %>")[0].click();            
+            });
+      });
+    </script>
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        var id = '#dialog';
+
+        //Get the screen height and width
+        var maskHeight = $(document).height();
+        var maskWidth = $(window).width();
+
+        //Set heigth and width to mask to fill up the whole screen
+        $('#mask').css({ 'width': maskWidth, 'height': maskHeight });
+
+        //transition effect		
+        $('#mask').fadeIn(1000);
+        $('#mask').fadeTo("slow", 0.8);
+
+        //Get the window height and width
+        var winH = $(window).height();
+        var winW = $(window).width();
+
+        //Set the popup window to center
+        $(id).css('top', winH / 2 - $(id).height() / 2);
+        $(id).css('left', winW / 2 - $(id).width() / 2);
+
+        //transition effect
+        $(id).fadeIn(2000);
+
+        //if close button is clicked
+        $('.window .close').click(function(e) {
+            //Cancel the link behavior
+            e.preventDefault();
+
+            $('#mask').hide();
+            $('.window').hide();
+        });
+
+        //if mask is clicked
+        $('#mask').click(function() {
+            $(this).hide();
+            $('.window').hide();
+        });
+
+    });
+
+</script>
+
+<style type="text/css">
+body {
+font-family:verdana;
+font-size:15px;
+}
+
+a {color:#333; text-decoration:none}
+a:hover {color:#ccc; text-decoration:none}
+
+#mask {
+  position:absolute;
+  left:0;
+  top:0;
+  z-index:9000;
+  background-color:#000;
+  display:none;
+}  
+#boxes .window {
+  position:absolute;
+  left:0;
+  top:0;
+  width:440px;
+  height:200px;
+  display:none;
+  z-index:9999;
+  padding:20px;
+}
+#boxes #dialog {
+  width:375px; 
+  height:203px;
+  padding:0px;
+  background-color:#ffffff;
+}
+</style>
+</head><body>
+
+<div id="boxes">
+<div style="top: 199.5px; left: 551.5px; display: none;" id="dialog" class="window">
+<form id="Form1" runat="server">
+    <table style="width: 100%; " >
+        <tr >
+            <td colspan="3" style="background-color: #85B5D9" align="center">
+                Login
+            </td>
+            
+        </tr>
+        <tr >
+            <td colspan="3">
+                &nbsp;
+            </td>
+            
+        </tr>
+        <tr >
+            <td colspan="3">
+                &nbsp;
+            </td>
+            
+        </tr>
+        <tr>
+            <td style="padding-left:10px">
+                User Name
+            </td>
+            <td>
+                <asp:TextBox ID="TextBoxUserName" runat="server" Width="120"></asp:TextBox>
+            </td>
+            <td>
+                &nbsp;
+            </td>
+        </tr>
+       <tr>
+            <td style="padding-left:10px">
+                Password
+            </td>
+            <td>
+                <asp:TextBox ID="TextBoxPassword" runat="server" TextMode="Password" Width="120"></asp:TextBox>
+            </td>
+            <td>
+                &nbsp;
+            </td>
+        </tr>
+         <tr>
+            <td>
+                &nbsp;
+            </td>
+            <td align="left">
+                <button id="Buttonlg" class="ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all" type="button" ><span class="ui-button-text">Login</span></button>
+                <asp:Button ID="ButtonLogin" OnClick="ButtonLogin_Click" runat="server" Text="" 
+                            Width="1px" Enabled="true" BackColor="White" BorderColor="White" 
+                            BorderStyle="None" />&nbsp;&nbsp;
+              <%-- <button id="ButtonReset" visible ="false" class="ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all" type="button" ><span class="ui-button-text">Reset</span></button>--%>
+            </td>
+            <td>
+                &nbsp;
+            </td>
+        </tr>
+        <tr>
+        <td>&nbsp</td>
+        <td>
+        <%--<button id="ButtonForgetPassword" visible ="false"  class="ui-button ui-button-text-only ui-widget ui-state-default ui-corner-all" type="button" ><span class="ui-button-text">Forget Password</span></button>--%>
+        </td>
+        <td>&nbsp</td>
+        </tr>
+        <tr>
+        <td colspan="3">
+            <asp:Label ID="LabelStatus" runat="server" Text="" ForeColor="Red"></asp:Label></td>
+        </tr>
+    </table>
+</form>
+
+</div>
+<!-- Mask to cover the whole screen -->
+<div style="width: 1478px; height: 602px; display: none; opacity: 0.8;" id="mask"></div>
+</div>
+</body>
+</html>

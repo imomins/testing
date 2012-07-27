@@ -1,0 +1,119 @@
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/svn/cvtc/!svn/ver/95/trunk/App_Code
+END
+Report.cs
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/cvtc/!svn/ver/27/trunk/App_Code/Report.cs
+END
+User.cs
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/cvtc/!svn/ver/69/trunk/App_Code/User.cs
+END
+CalendarDTO.cs
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/cvtc/!svn/ver/2/trunk/App_Code/CalendarDTO.cs
+END
+MailHelper.cs
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/cvtc/!svn/ver/28/trunk/App_Code/MailHelper.cs
+END
+CVTCMenu.cs
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/cvtc/!svn/ver/43/trunk/App_Code/CVTCMenu.cs
+END
+Assessment.cs
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/cvtc/!svn/ver/95/trunk/App_Code/Assessment.cs
+END
+MessageCenter.cs
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/cvtc/!svn/ver/85/trunk/App_Code/MessageCenter.cs
+END
+Student.cs
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/cvtc/!svn/ver/43/trunk/App_Code/Student.cs
+END
+Sections.cs
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/cvtc/!svn/ver/27/trunk/App_Code/Sections.cs
+END
+Reports.cs
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/cvtc/!svn/ver/58/trunk/App_Code/Reports.cs
+END
+Answer.cs
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/cvtc/!svn/ver/93/trunk/App_Code/Answer.cs
+END
+Course.cs
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/cvtc/!svn/ver/27/trunk/App_Code/Course.cs
+END
+TermCode.cs
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/cvtc/!svn/ver/29/trunk/App_Code/TermCode.cs
+END
+Task.cs
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/cvtc/!svn/ver/88/trunk/App_Code/Task.cs
+END
+ExportToExcel.cs
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/cvtc/!svn/ver/90/trunk/App_Code/ExportToExcel.cs
+END
+Interventions.cs
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/cvtc/!svn/ver/86/trunk/App_Code/Interventions.cs
+END
+Domain.cs
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/cvtc/!svn/ver/61/trunk/App_Code/Domain.cs
+END
+Question.cs
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/cvtc/!svn/ver/93/trunk/App_Code/Question.cs
+END
+Calendar.cs
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/cvtc/!svn/ver/2/trunk/App_Code/Calendar.cs
+END

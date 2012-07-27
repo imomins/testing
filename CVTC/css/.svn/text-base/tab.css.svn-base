@@ -1,0 +1,23 @@
+﻿		#tabs { margin:0; padding:0; list-style:none; overflow:hidden; }
+        #tabs li { float:left; display:block; padding:5px; background-color:#7DAFD6; margin-right:5px;}
+        #tabs li a { color:#fff; text-decoration:none;font-weight:bold; }
+        #tabs li.current { background-color:#FAFCFC; }
+        #tabs li.current a { color:#1371FD;  text-decoration:none; }
+        #tabs li a.remove { color:#FCBE04;font-weight:bold; margin-left:10px;}
+        #content { background-color:#FFFFFF; }
+        #content p { margin: 0; height:400px; padding:20px 20px 100px 20px;}
+        
+        #main { width:900px; margin:0px auto; overflow:hidden;background-color:#F6F6F6; margin-top:20px;
+             -moz-border-radius:10px;  -webkit-border-radius:10px; padding:30px;}
+        #wrapper, #doclist { float:left; margin:0 20px 0 0;}
+        #doclist { width:150px; border-right:solid 1px #dcdcdc;}
+        #doclist ul { margin:0; list-style:none;}
+        #doclist li { margin:10px 0; padding:0;}
+        .documents { margin:0; padding:0;}
+        
+        #wrapper { width:1000px; height:1000px; margin-top:20px;}
+            
+        #header{ background-color:#F6F6F6; width:900px; margin:0px auto; margin-top:20px;
+             -moz-border-radius:10px;  -webkit-border-radius:10px; padding:30px; position:relative;}
+        #header h2 {font-size:16px; font-weight:normal; margin:0px; padding:0px;}
+        .istyle{margin-left: 0px;margin-top: 0px;margin-right: 0px;margin-bottom: 0px; border:none; min-height:100%;}

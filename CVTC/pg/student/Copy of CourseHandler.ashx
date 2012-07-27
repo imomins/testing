@@ -1,0 +1,508 @@
+﻿<%@ WebHandler Language="C#" Class="CourseHandler" %>
+
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Data.SqlClient;
+using System.Web;
+using System.Web.Script.Serialization;
+using System.Data.Odbc;
+using System.Web.SessionState;
+
+public class CourseHandler : IHttpHandler, IReadOnlySessionState
+{
+    //string connectionString = @"Data Source=(Local); Initial Catalog=cvtc; User ID=cvtc; Password=cvtc";
+    string connectionString = "";
+    public void ProcessRequest (HttpContext context) 
+    {
+        connectionString = System.Web.Configuration.WebConfigurationManager.AppSettings["ConnectionString"].ToString();
+
+        HttpRequest request = context.Request;
+        HttpResponse response = context.Response;
+
+        string _search = request["_search"];
+        string numberOfRows = request["rows"];
+        string pageIndex = request["page"];
+        string sortColumnName = request["sidx"];
+        string sortOrderBy = request["sord"];
+        string operation = request["oper"];
+        string field = request["searchField"];
+        string val = request["searchString"];
+
+        string reportname = request["reportname"];
+        string hiddenfields = request["hiddenfields"];
+        string spparams = request.RawUrl.ToString();
+        string isreport = request["isreport"];
+ 
+ 
+        
+        if (isreport == "yes")
+        {
+            _search = "true";
+        }
+
+        if ((!string.IsNullOrEmpty(reportname)) && (reportname != ""))
+        {
+            string[] stringSeparatorsasc = new string[] { "&sord=asc" };
+            string[] stringSeparatorsdesc = new string[] { "&sord=desc" };
+
+            if (spparams.Contains("&sord=asc"))
+            {
+                spparams = spparams.Split(stringSeparatorsasc, StringSplitOptions.None)[1];
+            }
+            else if (spparams.Contains("&sord=desc"))
+            {
+                spparams = spparams.Split(stringSeparatorsdesc, StringSplitOptions.None)[1];
+            }
+            else
+            {
+                spparams = "";
+            }
+
+            bool status = InsertSearchStudentReport(reportname, spparams, hiddenfields);
+        }
+        else if (_search == "true")
+        {
+
+            int totalRecords;
+            //Collection<Course> courses = SearchCourse(numberOfRows, pageIndex, sortColumnName, sortOrderBy, out totalRecords, request["BannerStudentName"], request["BannerStudentIDNumber"], request["TermCodeofProgramEnrollment"], request["CourseNumber"], request["CourseTitle"], request["FinalGrade"], request["TermCodeOfCourseEnrollment"], request["MethodOfDelivery"], Convert.ToDateTime(request["ImportDate"]), Convert.ToInt32(request["CourseOID"]), Convert.ToDateTime(request["FileCreationDate"]));
+            Collection<Course> courses = SearchCourse(numberOfRows, pageIndex, sortColumnName, sortOrderBy, out totalRecords, request["NAME"], request["BID"], request["TERMEFF"], request["CRSENO"], request["CRSETITLE"], request["FINALGRDE"], request["CRSETERM"], request["DeliveryMethod"], Convert.ToDateTime(request["ImportDate"]), Convert.ToInt32(request["CourseOID"]), Convert.ToDateTime(request["FileCreationDate"]));
+            string output = BuildJQGridResults(courses, Convert.ToInt32(numberOfRows), Convert.ToInt32(pageIndex), Convert.ToInt32(totalRecords));
+            response.Write(output);
+            
+            //Add data to Session variable
+            context.Session["CourseReportDt"] = this.ConvertListToDataTable(courses);
+        }
+        else if (operation == "edit")
+        {
+            UpdateCourse(Convert.ToInt32(request["id"]), request["NAME"], request["BID"], request["TERMEFF"], request["CRSENO"], request["CRSETITLE"], request["FINALGRDE"], request["CRSETERM"], request["DeliveryMethod"], Convert.ToDateTime(request["ImportDate"]));
+        }
+        else//(operation == null)
+        {
+            int totalRecords;
+            Collection<Course> courses = GetCourse(numberOfRows, pageIndex, sortColumnName, sortOrderBy, out totalRecords);
+            string output = BuildJQGridResults(courses, Convert.ToInt32(numberOfRows), Convert.ToInt32(pageIndex), Convert.ToInt32(totalRecords));
+
+            response.Write(output);
+        }
+    }
+
+    private DataTable ConvertListToDataTable(Collection<Course> courses)
+    {
+        DataTable dt = new DataTable();
+        try
+        {
+            
+            dt.Columns.Add("CourseOID");
+            dt.Columns.Add("NAME");
+            dt.Columns.Add("BID");
+            dt.Columns.Add("TERMEFF");
+            dt.Columns.Add("CRSENO");
+            dt.Columns.Add("CRSETITLE");
+            dt.Columns.Add("FINALGRDE");
+            dt.Columns.Add("CRSETERM");
+            dt.Columns.Add("DeliveryMethod");
+            dt.Columns.Add("ImportDate");
+
+            foreach (Course course in courses)
+            {
+                DataRow row = dt.NewRow();
+                row["CourseOID"] = course.CourseOID.ToString();
+                row["NAME"] = course.BannerStudentName;
+                row["BID"] = course.BannerStudentIDNumber;
+                row["TERMEFF"] = course.TermCodeofProgramEnrollment;
+                row["CRSENO"] = course.CourseNumber;
+                row["CRSETITLE"] = course.CourseTitle;
+                row["FINALGRDE"] = course.FinalGrade;
+                row["CRSETERM"] = course.TermCodeOfCourseEnrollment;
+                row["DeliveryMethod"] = course.MethodOfDelivery;
+                row["ImportDate"] = course.ImportDate.ToShortDateString();
+                dt.Rows.Add(row);
+            }
+            return dt;
+        }
+        catch (Exception ex)
+        {
+            return dt;
+        }
+    }
+    
+    public bool IsReusable {
+        get {
+            return false;
+        }
+    }
+ 
+    private void UpdateCourse(int courseOID, string StudentName, string BannerID, string ProgramEnrollment, string CourseNumber, string CourseTitle, string FinalGrade, string CourseEnrollment, string MethodOfDelivery, DateTime ImportDate)
+    {
+        try
+        {
+            Course crse = new Course();
+            crse.CourseTitle = CourseTitle;
+            crse.BannerStudentIDNumber = BannerID;
+            crse.BannerStudentName = StudentName;
+            crse.CourseNumber = CourseNumber;
+            crse.CourseOID = courseOID;
+            crse.FinalGrade = FinalGrade;
+            crse.ImportDate = ImportDate;
+            crse.MethodOfDelivery = MethodOfDelivery;
+            crse.TermCodeOfCourseEnrollment = CourseEnrollment;
+            crse.TermCodeofProgramEnrollment = ProgramEnrollment;
+            crse.UpdateCourse(crse);
+                
+        }
+        catch (Exception ex)
+        { }
+    }
+    
+    private Collection<Course> GetCourse(string numberOfRows, string pageIndex, string sortColumnName, string sortOrderBy, out int totalRecords)
+    {
+        Collection<Course > courses = new Collection<Course >();
+
+        using (OdbcConnection connection = new OdbcConnection(connectionString))
+        {
+            using (OdbcCommand command = new OdbcCommand())
+            {
+                command.Connection = connection;
+                command.CommandText = "{CALL Course_SelectjqGrid(?,?,?,?,?)}";
+                command.CommandType = CommandType.StoredProcedure;
+
+                OdbcParameter paramPageIndex = new OdbcParameter("@PageIndex", OdbcType.Int);
+                paramPageIndex.Value = Convert.ToInt32(pageIndex);
+                command.Parameters.Add(paramPageIndex);
+
+                OdbcParameter paramColumnName = new OdbcParameter("@SortColumnName", OdbcType.VarChar, 50);
+                paramColumnName.Value = sortColumnName;
+                command.Parameters.Add(paramColumnName);
+
+                OdbcParameter paramSortorderBy = new OdbcParameter("@SortOrderBy", OdbcType.VarChar, 4);
+                paramSortorderBy.Value = sortOrderBy;
+                command.Parameters.Add(paramSortorderBy);
+
+                OdbcParameter paramNumberOfRows = new OdbcParameter("@NumberOfRows", OdbcType.Int);
+                paramNumberOfRows.Value = Convert.ToInt32(numberOfRows);
+                command.Parameters.Add(paramNumberOfRows);
+
+                OdbcParameter paramTotalRecords = new OdbcParameter("@TotalRecords", OdbcType.Int);
+                totalRecords = 0;
+                paramTotalRecords.Value = totalRecords;
+                paramTotalRecords.Direction = ParameterDirection.Output;
+                command.Parameters.Add(paramTotalRecords);
+
+                connection.Open();
+                using (OdbcDataReader dataReader = command.ExecuteReader())
+                {
+                    Course course;
+                    while (dataReader.Read())
+                    {
+                        course = new Course();
+                        if (dataReader["CourseOID"] != null)
+                        {
+                            course.CourseOID = Convert.ToInt32(dataReader["CourseOID"]);
+                        }
+                        if (dataReader["BannerStudentName"] != null)
+                        {
+                        course.BannerStudentName = Convert.ToString(dataReader["BannerStudentName"]);
+                        }
+                        if (dataReader["BannerStudentIDNumber"] != null)
+                        {
+                        course.BannerStudentIDNumber = Convert.ToString(dataReader["BannerStudentIDNumber"]);
+                        }
+                        if (dataReader["TermCodeofProgramEnrollment"] != null)
+                        {
+                           course.TermCodeofProgramEnrollment = Convert.ToString(dataReader["TermCodeofProgramEnrollment"]);
+                        }
+                         if (dataReader["CourseNumber"] != null)
+                        {
+                        course.CourseNumber = Convert.ToString(dataReader["CourseNumber"]);
+                        }
+                         if (dataReader["CourseTitle"] != null)
+                         {
+                             course.CourseTitle = Convert.ToString(dataReader["CourseTitle"]);
+                         }
+                         if (dataReader["FinalGrade"] != null)
+                         {
+                             course.FinalGrade = Convert.ToString(dataReader["FinalGrade"]);
+                         }
+                         if (dataReader["TermCodeOfCourseEnrollment"] != null)
+                         {
+                             course.TermCodeOfCourseEnrollment = Convert.ToString(dataReader["TermCodeOfCourseEnrollment"]);
+                         }
+                         if (dataReader["MethodOfDelivery"] != null)
+                         {
+                             course.MethodOfDelivery = Convert.ToString(dataReader["MethodOfDelivery"]);
+                         }
+                         if (dataReader["ImportDate"] != null)
+                         {
+                             course.ImportDate = Convert.ToDateTime(dataReader["ImportDate"]);
+                         }
+                         if (dataReader["FileCreationDate"] != null)
+                         {
+                             course.FileCreationDate = Convert.ToDateTime(dataReader["FileCreationDate"]);
+                         }
+                        courses.Add(course);
+
+                    }
+                }
+                totalRecords = (int)paramTotalRecords.Value;
+            }
+
+            return courses;
+        }
+
+    }
+
+
+    private bool InsertSearchStudentReport(string reportname, string spparams, string gridcolumns)//, string numberOfRows, string pageIndex, string sortColumnName, string sortOrderBy, out int totalRecords, int StudentOID, string NAME, string ID, string TERM, string PFIND, double GPA, double ATMPCR, double EARNCR, string C1, string C2, string CW, string CR, string AE, string AM, string AR, string SA, DateTime SDATE, string HSDESC, DateTime HS_GRAD_DATE, string ADDR1, string ADDR2, string ADDR3, string CITY, string STATE, string ZIP, DateTime FILEDATE, string PPGMIND, string MAJOR, string Email, string Phone)
+    {
+        bool result = false;
+
+        int reportOID = 0;
+        String ReportName = (reportname == null) ? "" : reportname;
+        String SPName = "";
+        String SPParams = (spparams == null) ? "" : spparams;
+        String GridColumns = (gridcolumns == null) ? "" : gridcolumns;
+        DateTime CreatedDate = System.DateTime.Now;
+
+        using (OdbcConnection connection = new OdbcConnection(connectionString))
+        {
+            using (OdbcCommand command = new OdbcCommand())
+            {
+                command.Connection = connection;
+                command.CommandText = "{CALL Reports_Insert(?,?,?,?,?,?)}";
+                command.CommandType = CommandType.StoredProcedure;
+
+                OdbcParameter returnParam = command.Parameters.Add("@ReportOID", OdbcType.Int);
+                returnParam.Direction = ParameterDirection.ReturnValue;
+
+                //command.Parameters.AddWithValue("@ReportOID",0);
+                command.Parameters.AddWithValue("@ReportName", ReportName);
+                command.Parameters.AddWithValue("@SPName", SPName);
+                command.Parameters.AddWithValue("@SPParams", SPParams);
+                command.Parameters.AddWithValue("@GridColumns", GridColumns);
+                command.Parameters.AddWithValue("@CreatedDate", CreatedDate);
+
+                connection.Open();
+                int n = command.ExecuteNonQuery();
+                if (n == 1)
+                    result = true;
+                else
+                    result = false;
+                if (result)
+                {
+                    reportOID = (int)command.Parameters["@ReportOID"].Value;
+
+                    //To Insert menu
+                    CVTCMenu menu = new CVTCMenu();
+                    menu.NameMenu = ReportName;
+                    int menuId = new CVTCMenu().GetMaxMenuID();
+                    menuId += 1;
+                    menu.MenuID = menuId;
+                    menu.URL = "pg/student/coursereport.aspx?ReportOID=" + reportOID;
+                    menu.MenuLevel = 1;
+                    menu.Parent = 6;
+                    menu.IsExpanded = "true";
+                    menu.IsLeave = "true";
+                    menu.SaveAssessmentMenuItem(menu);
+                }
+                else
+                {
+                    reportOID = 0;
+                }
+            }
+        }
+        return true;
+    }    
+    
+    
+    private Collection<Course> SearchCourse(string numberOfRows, string pageIndex, string sortColumnName, string sortOrderBy, out int totalRecords, string bannerStudentName, string bannerStudentIDNumber, string termCodeofProgramEnrollment, string courseNumber, string courseTitle, string finalGrade, string termCodeOfCourseEnrollment, string methodOfDelivery, DateTime importDate, Int32 courseOID, DateTime fileCreationDate)
+    {
+        bannerStudentName = (bannerStudentName == null) ? "" : bannerStudentName;
+        bannerStudentIDNumber = (bannerStudentIDNumber == null) ? "" : bannerStudentIDNumber;
+        termCodeofProgramEnrollment = (termCodeofProgramEnrollment == null) ? "" : termCodeofProgramEnrollment;
+        courseNumber = (courseNumber == null) ? "" : courseNumber;
+        courseTitle = (courseTitle == null) ? "" : courseTitle;
+        finalGrade = (finalGrade == null) ? "" : finalGrade;
+
+        termCodeOfCourseEnrollment = (termCodeOfCourseEnrollment == null) ? "" : termCodeOfCourseEnrollment;
+        methodOfDelivery = (methodOfDelivery == null) ? "" : methodOfDelivery;
+
+        importDate = ((importDate == null) || (importDate == Convert.ToDateTime("1/1/0001"))) ? Convert.ToDateTime("1/1/1900") : importDate;
+        courseOID = (courseOID < 1) ? 0 : courseOID;
+        fileCreationDate = ((fileCreationDate == null) || (fileCreationDate == Convert.ToDateTime("1/1/0001"))) ? Convert.ToDateTime("1/1/1900") : fileCreationDate;
+
+        Collection<Course> courses = new Collection<Course>();
+
+        using (OdbcConnection connection = new OdbcConnection(connectionString))
+        {
+            using (OdbcCommand command = new OdbcCommand())
+            {
+                command.Connection = connection;
+                command.CommandText = "{CALL Course_Search(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+                command.CommandType = CommandType.StoredProcedure;
+
+                OdbcParameter paramPageIndex = new OdbcParameter("@PageIndex", OdbcType.Int);
+                paramPageIndex.Value = Convert.ToInt32(pageIndex);
+                command.Parameters.Add(paramPageIndex);
+
+                OdbcParameter paramColumnName = new OdbcParameter("@SortColumnName", OdbcType.VarChar, 50);
+                paramColumnName.Value = sortColumnName;
+                command.Parameters.Add(paramColumnName);
+
+                OdbcParameter paramSortorderBy = new OdbcParameter("@SortOrderBy", OdbcType.VarChar, 4);
+                paramSortorderBy.Value = sortOrderBy;
+                command.Parameters.Add(paramSortorderBy);
+
+                OdbcParameter paramNumberOfRows = new OdbcParameter("@NumberOfRows", OdbcType.Int);
+                paramNumberOfRows.Value = Convert.ToInt32(numberOfRows);
+                command.Parameters.Add(paramNumberOfRows);
+
+                OdbcParameter paramTotalRecords = new OdbcParameter("@TotalRecords", OdbcType.Int);
+                totalRecords = 0;
+                paramTotalRecords.Value = totalRecords;
+                paramTotalRecords.Direction = ParameterDirection.Output;
+                command.Parameters.Add(paramTotalRecords);
+
+
+
+                OdbcParameter paramBannerStudentName = new OdbcParameter("@BannerStudentName", OdbcType.VarChar, 80);
+                paramBannerStudentName.Value = bannerStudentName;
+                command.Parameters.Add(paramBannerStudentName);
+
+                OdbcParameter paramBannerStudentIDNumber = new OdbcParameter("@BannerStudentIDNumber", OdbcType.VarChar, 12);
+                paramBannerStudentIDNumber.Value = bannerStudentIDNumber;
+                command.Parameters.Add(paramBannerStudentIDNumber);
+
+                OdbcParameter paramTermCodeofProgramEnrollment = new OdbcParameter("@TermCodeofProgramEnrollment", OdbcType.VarChar, 20);
+                paramTermCodeofProgramEnrollment.Value = termCodeofProgramEnrollment;
+                command.Parameters.Add(paramTermCodeofProgramEnrollment);
+
+                OdbcParameter paramCourseNumber = new OdbcParameter("@CourseNumber", OdbcType.VarChar, 15);
+                paramCourseNumber.Value = courseNumber;
+                command.Parameters.Add(paramCourseNumber);
+
+                OdbcParameter paramCourseTitle = new OdbcParameter("@CourseTitle", OdbcType.VarChar, 100);
+                paramCourseTitle.Value = courseTitle;
+                command.Parameters.Add(paramCourseTitle);
+
+                OdbcParameter paramFinalGrade = new OdbcParameter("@FinalGrade", OdbcType.VarChar, 15);
+                paramFinalGrade.Value = finalGrade;
+                command.Parameters.Add(paramFinalGrade);
+
+                OdbcParameter paramTermCodeOfCourseEnrollment = new OdbcParameter("@TermCodeOfCourseEnrollment", OdbcType.VarChar, 15);
+                paramTermCodeOfCourseEnrollment.Value = termCodeOfCourseEnrollment;
+                command.Parameters.Add(paramTermCodeOfCourseEnrollment);
+
+                OdbcParameter paramMethodOfDelivery = new OdbcParameter("@MethodOfDelivery", OdbcType.VarChar, 50);
+                paramMethodOfDelivery.Value = methodOfDelivery;
+                command.Parameters.Add(paramMethodOfDelivery);
+
+                OdbcParameter paramImportDate = new OdbcParameter("@ImportDate", OdbcType.DateTime);
+                paramImportDate.Value = importDate;
+                command.Parameters.Add(paramImportDate);
+
+                OdbcParameter paramCourseOID = new OdbcParameter("@CourseOID", OdbcType.Int);
+                paramCourseOID.Value = courseOID;
+                command.Parameters.Add(paramCourseOID);
+
+                OdbcParameter paramFileCreationDate = new OdbcParameter("@FileCreationDate", OdbcType.DateTime);
+                paramFileCreationDate.Value = fileCreationDate;
+                command.Parameters.Add(paramFileCreationDate);
+
+
+                connection.Open();
+                using (OdbcDataReader dataReader = command.ExecuteReader())
+                {
+                    Course course;
+                    while (dataReader.Read())
+                    {
+                        course = new Course();
+                        if (dataReader["CourseOID"] != null)
+                        {
+                            course.CourseOID = Convert.ToInt32(dataReader["CourseOID"]);
+                        }
+                        if (dataReader["BannerStudentName"] != null)
+                        {
+                            course.BannerStudentName = Convert.ToString(dataReader["BannerStudentName"]);
+                        }
+                        if (dataReader["BannerStudentIDNumber"] != null)
+                        {
+                            course.BannerStudentIDNumber = Convert.ToString(dataReader["BannerStudentIDNumber"]);
+                        }
+                        if (dataReader["TermCodeofProgramEnrollment"] != null)
+                        {
+                            course.TermCodeofProgramEnrollment = Convert.ToString(dataReader["TermCodeofProgramEnrollment"]);
+                        }
+                        if (dataReader["CourseNumber"] != null)
+                        {
+                            course.CourseNumber = Convert.ToString(dataReader["CourseNumber"]);
+                        }
+                        if (dataReader["CourseTitle"] != null)
+                        {
+                            course.CourseTitle = Convert.ToString(dataReader["CourseTitle"]);
+                        }
+                        if (dataReader["FinalGrade"] != null)
+                        {
+                            course.FinalGrade = Convert.ToString(dataReader["FinalGrade"]);
+                        }
+                        if (dataReader["TermCodeOfCourseEnrollment"] != null)
+                        {
+                            course.TermCodeOfCourseEnrollment = Convert.ToString(dataReader["TermCodeOfCourseEnrollment"]);
+                        }
+                        if (dataReader["MethodOfDelivery"] != null)
+                        {
+                            course.MethodOfDelivery = Convert.ToString(dataReader["MethodOfDelivery"]);
+                        }
+                        if (dataReader["ImportDate"] != null)
+                        {
+                            course.ImportDate = Convert.ToDateTime(dataReader["ImportDate"]);
+                        }
+                        if (dataReader["FileCreationDate"] != null)
+                        {
+                            course.FileCreationDate = Convert.ToDateTime(dataReader["FileCreationDate"]);
+                        }
+                        courses.Add(course);
+
+                    }
+                }
+                totalRecords = (int)paramTotalRecords.Value;
+            }
+
+            return courses;
+        }
+
+    }
+
+    
+    private string BuildJQGridResults(Collection<Course > courses, int numberOfRows, int pageIndex, int totalRecords)
+    {
+
+        JQGridResults result = new JQGridResults();
+        List<JQGridRow> rows = new List<JQGridRow>();
+        foreach (Course course in courses)
+        {
+            JQGridRow row = new JQGridRow();
+            row.id = course.CourseOID;
+            row.cell = new string[10];
+            row.cell[0] = course.CourseOID.ToString();
+            row.cell[1] = course.BannerStudentName;
+            row.cell[2] = course.BannerStudentIDNumber;
+            row.cell[3] = course.TermCodeofProgramEnrollment;
+            row.cell[4] = course.CourseNumber;
+            row.cell[5] = course.CourseTitle;
+            row.cell[6] = course.FinalGrade;
+            row.cell[7] = course.TermCodeOfCourseEnrollment;
+            row.cell[8] = course.MethodOfDelivery;
+            row.cell[9] = course.ImportDate.ToShortDateString ();
+            
+            rows.Add(row);
+        }
+        result.rows = rows.ToArray();
+        result.page = pageIndex;
+        result.total = totalRecords / numberOfRows;
+        if (totalRecords % numberOfRows != 0) result.total += 1;
+        result.records = totalRecords;
+        return new JavaScriptSerializer().Serialize(result);
+    }
+}

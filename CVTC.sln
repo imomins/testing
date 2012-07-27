@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "CVTC", "E:\USER\Babul\Project\CVTC\SourceCode\CVTC\", "{8C6EE86E-5E51-45C3-88D6-18A4F07F00B5}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFramework = "3.5"
+		Debug.AspNetCompiler.VirtualPath = "/CVTC"
+		Debug.AspNetCompiler.PhysicalPath = "E:\USER\Babul\Project\CVTC\SourceCode\CVTC\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\CVTC\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/CVTC"
+		Release.AspNetCompiler.PhysicalPath = "E:\USER\Babul\Project\CVTC\SourceCode\CVTC\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\CVTC\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "7734"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|.NET = Debug|.NET
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8C6EE86E-5E51-45C3-88D6-18A4F07F00B5}.Debug|.NET.ActiveCfg = Debug|.NET
+		{8C6EE86E-5E51-45C3-88D6-18A4F07F00B5}.Debug|.NET.Build.0 = Debug|.NET
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

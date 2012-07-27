@@ -1,0 +1,58 @@
+8
+
+dir
+95
+http://aether/svn/cvtc/trunk/pg
+http://aether/svn/cvtc
+
+
+
+2011-12-20T14:22:42.216051Z
+95
+babul
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+cbb0a299-02ad-a24d-ac31-cd7a953354e0
+
+answer
+dir
+
+task
+dir
+
+intervention
+dir
+
+message
+dir
+
+assessment
+dir
+
+student
+dir
+
+calendar
+dir
+
+import
+dir
+
+report
+dir
+
+user
+dir
+

@@ -1,0 +1,832 @@
+﻿using System;
+using System.Data;
+using System.Configuration;
+using System.Linq;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Xml.Linq;
+using System.Collections.ObjectModel;
+using System.Data.SqlClient;
+using System.Data.Odbc;
+
+
+/// <summary>
+/// Summary description for Student
+/// </summary>
+[Serializable]
+public class Student
+{
+    string connectionString;
+	public Student()
+	{
+        connectionString = System.Web.Configuration.WebConfigurationManager.AppSettings["ConnectionString"].ToString();
+    }
+    #region Public Properties
+  
+    public int StudentOID
+    { get; set; }
+
+    public string LastName
+    { get; set; }
+  
+    public string FirstName
+    {
+        get; set; 
+    }
+
+   
+    public string FullName
+    { get; set; }
+
+    public string StudentID
+    { get; set; }
+
+    public string ProgramEnrollment
+    { get; set; }
+
+    public string TimeIndicator
+    { get; set; }
+
+    public double  CumulativeGPA
+    { get; set; }
+
+    public double CreditAttempted
+    { get; set; }
+
+    public double CreditEarned
+    { get; set; }
+
+    public string PrealgebraTestScore
+    { get; set; }
+
+    public string CompassalgebraTestScore
+    { get; set; }
+
+    public string CompassWrittingTestScore
+    { get; set; }
+
+    public string CompassReadingTestScore
+    { get; set; }
+
+    public string EnglishAssessmentScore
+    { get; set; }
+
+    public string MathAssessmentScore
+    { get; set; }
+
+    public string ReadingAssessmentScore
+    { get; set; }
+
+    public string ScienceAssessmentScore
+    { get; set; }
+
+    public DateTime LatestTestingDate
+    { get; set; }
+
+    public string HighSchoolName
+    { get; set; }
+
+    public DateTime HighSchoolGraduationDate
+    { get; set; }
+
+    public string HomeTelephoneNumber
+    { get; set; }
+
+    public string AddressOne
+    { get; set; }
+
+    public string AddressTwo
+    { get; set; }
+
+    public string AddressThree
+    { get; set; }
+
+    public string City
+    { get; set; }
+
+    public string State
+    { get; set; }
+
+    public string ZIPCode
+    { get; set; }
+
+    public string EmailAddress
+    { get; set; }
+
+    public DateTime ImportDate
+    { get; set; }
+
+    public string  PreprogramIndicator
+    { get; set; }
+
+    public string MajorProgramEnrollment
+    { get; set; }
+    
+    public DateTime FileCreatedDate
+    { get; set; }
+     public string  NTO
+    { get; set; }
+    public string  MC
+    { get; set; }
+    public string  PELL
+    { get; set; }
+    public string  RVP
+    { get; set; }
+    public string  ALLERT
+    { get; set; }
+    public int ResultLetterSentTimes
+    { get; set; }
+
+    #endregion
+
+    public Student GetStudentByStudentOID(string  SOID)
+    {
+       // Collection<Student> studentList = new Collection<Student>();
+        Student student = this;
+        using (OdbcConnection connection = new OdbcConnection(connectionString))
+        {
+            using (OdbcCommand command = new OdbcCommand())
+            {
+
+                command.Connection = connection;
+                command.CommandText = "{CALL Student_ByStudentOID(?)}";
+                command.CommandType = CommandType.StoredProcedure;
+
+                //Set Parameter Value
+                command.Parameters.AddWithValue("@SOID", SOID);
+                //Open connection
+                connection.Open();
+                //Read using reader
+                using (OdbcDataReader dataReader = command.ExecuteReader())
+                {
+                    //Question q = new Question();
+                   // Student  student;
+                   // while (dataReader.Read())
+                    if(dataReader.Read())
+                    {
+
+                        //Changed by Babul 
+                        //student = new Student();
+                        student.StudentOID = Convert.ToInt32(dataReader["StudentOID"]);
+                        string strName = Convert.ToString(dataReader["BannerStudentName"]);
+                        string[] strfname = strName.Split(',');
+                        string strFirstName = strfname[1];
+                        string strLastname = strfname[0];
+                        //student.LastName = strLastname;
+                        //.FirstName = strFirstName;
+                        student.FullName = strName;
+                        student.StudentID = Convert.ToString(dataReader["BannerStudentIDNumber"]);
+                        student.ProgramEnrollment = Convert.ToString(dataReader["TermCodeofProgramEnrollment"]);
+                        student.TimeIndicator = Convert.ToString(dataReader["FullTimeOrPartTimeIndicator"]);
+                        student.CumulativeGPA = Convert.ToDouble(dataReader["CumulativeGPA"]);
+                        student.CreditAttempted = Convert.ToDouble(dataReader["CreditsAttempted"]);
+                        student.CreditEarned = Convert.ToDouble(dataReader["CreditsEarned"]);
+                        student.PrealgebraTestScore = Convert.ToString(dataReader["LatestCompassPrealgebraTestScore"]);
+                        student.CompassalgebraTestScore = Convert.ToString(dataReader["LatestCompassAlgebraTestScore"]);
+                        student.CompassWrittingTestScore = Convert.ToString(dataReader["LatestCompassWritingTestScore"]);
+                        student.CompassReadingTestScore = Convert.ToString(dataReader["LatestCompassReadingTestScore"]);
+                        student.EnglishAssessmentScore = Convert.ToString(dataReader["LatestACTEnglishAssessmentScore"]);
+                        student.MathAssessmentScore = Convert.ToString(dataReader["LatestACTMathAssessmentScore"]);
+                        student.ReadingAssessmentScore = Convert.ToString(dataReader["LatestACTReadingAssessmentScore"]);
+                        student.ScienceAssessmentScore = Convert.ToString(dataReader["LatestACTScienceAssessmentScore"]);
+                        student.LatestTestingDate = Convert.ToDateTime(dataReader["LatestTestingDate"]);
+                        student.HighSchoolName = Convert.ToString(dataReader["HighSchoolName"]);
+                        student .HighSchoolGraduationDate = Convert.ToDateTime(dataReader["HighSchoolGraduationDate"]);
+                        student .HomeTelephoneNumber = Convert.ToString(dataReader["HomeTelephoneNumber"]);
+                        student .AddressOne = Convert.ToString(dataReader["MailingAddressLineOne"]);
+                        student .AddressTwo = Convert.ToString(dataReader["MailingAddressLineTwo"]);
+                        student .AddressThree = Convert.ToString(dataReader["MailingAddressLineThree"]);
+                        student .City  = Convert.ToString(dataReader["City"]);
+                        student .State = Convert.ToString(dataReader["StateName"]);
+                        student .ZIPCode = Convert.ToString(dataReader["ZipCode"]);
+                        student .EmailAddress = Convert.ToString(dataReader["EmailAddress"]);
+                        student .ImportDate= Convert.ToDateTime(dataReader["ImportDateFileCreationDate"]);
+                        student .PreprogramIndicator= Convert.ToString(dataReader["PreprogramIndicator"]);
+                        student .MajorProgramEnrollment = Convert.ToString(dataReader["MajorProgramEnrollmentName"]);
+                        student.FileCreatedDate = Convert.ToDateTime(dataReader["FileCreationDate"]);
+                        student.NTO = Convert.ToString(dataReader["NTO"]);
+                        student.MC = Convert.ToString(dataReader["MC"]);
+                        student.PELL = Convert.ToString(dataReader["PELL"]);
+                        student.RVP = Convert.ToString(dataReader["RVP"]);
+                        student.ALLERT = Convert.ToString(dataReader["ALLERT"]);
+                       // studentList.Add(student);
+                         
+                    }
+                }
+
+            }
+        }
+        return student;
+    }
+
+    public Collection<Student> GetAllStudentByStudentOID()
+    {
+        Collection<Student> studentList = new Collection<Student>();
+        using (OdbcConnection connection = new OdbcConnection(connectionString))
+        {
+            using (OdbcCommand command = new OdbcCommand())
+            {
+
+                command.Connection = connection;
+                command.CommandText = "AllStudent_ByStudentOID";
+                command.CommandType = CommandType.StoredProcedure;
+
+                //Set Parameter Value
+                //command.Parameters.AddWithValue("@SOID", SOID);
+                //Open connection
+                connection.Open();
+                //Read using reader
+                using (OdbcDataReader dataReader = command.ExecuteReader())
+                {
+                    //Question q = new Question();
+                    Student student;
+                    while (dataReader.Read())
+                    {
+                        student = new Student();
+                        student.StudentOID = Convert.ToInt32(dataReader["StudentOID"]);
+                        string strName = Convert.ToString(dataReader["BannerStudentName"]);
+                        string[] strfname = strName.Split(',');
+                        string strFirstName = strfname[1];
+                        string strLastname = strfname[0];
+                        //student.LastName = strLastname;
+                        //.FirstName = strFirstName;
+                        student.FullName = strName;
+                        student.StudentID = Convert.ToString(dataReader["BannerStudentIDNumber"]);
+                        student.ProgramEnrollment = Convert.ToString(dataReader["TermCodeofProgramEnrollment"]);
+                        student.TimeIndicator = Convert.ToString(dataReader["FullTimeOrPartTimeIndicator"]);
+                        student.CumulativeGPA = Convert.ToDouble(dataReader["CumulativeGPA"]);
+                        student.CreditAttempted = Convert.ToDouble(dataReader["CreditsAttempted"]);
+                        student.CreditEarned = Convert.ToDouble(dataReader["CreditsEarned"]);
+                        student.PrealgebraTestScore = Convert.ToString(dataReader["LatestCompassPrealgebraTestScore"]);
+                        student.CompassalgebraTestScore = Convert.ToString(dataReader["LatestCompassAlgebraTestScore"]);
+                        student.CompassWrittingTestScore = Convert.ToString(dataReader["LatestCompassWritingTestScore"]);
+                        student.CompassReadingTestScore = Convert.ToString(dataReader["LatestCompassReadingTestScore"]);
+                        student.EnglishAssessmentScore = Convert.ToString(dataReader["LatestACTEnglishAssessmentScore"]);
+                        student.MathAssessmentScore = Convert.ToString(dataReader["LatestACTMathAssessmentScore"]);
+                        student.ReadingAssessmentScore = Convert.ToString(dataReader["LatestACTReadingAssessmentScore"]);
+                        student.ScienceAssessmentScore = Convert.ToString(dataReader["LatestACTScienceAssessmentScore"]);
+                        student.LatestTestingDate = Convert.ToDateTime(dataReader["LatestTestingDate"]);
+                        student.HighSchoolName = Convert.ToString(dataReader["HighSchoolName"]);
+                        student.HighSchoolGraduationDate = Convert.ToDateTime(dataReader["HighSchoolGraduationDate"]);
+                        student.HomeTelephoneNumber = Convert.ToString(dataReader["HomeTelephoneNumber"]);
+                        student.AddressOne = Convert.ToString(dataReader["MailingAddressLineOne"]);
+                        student.AddressTwo = Convert.ToString(dataReader["MailingAddressLineTwo"]);
+                        student.AddressThree = Convert.ToString(dataReader["MailingAddressLineThree"]);
+                        student.City = Convert.ToString(dataReader["City"]);
+                        student.State = Convert.ToString(dataReader["StateName"]);
+                        student.ZIPCode = Convert.ToString(dataReader["ZipCode"]);
+                        student.EmailAddress = Convert.ToString(dataReader["EmailAddress"]);
+                        student.ImportDate = Convert.ToDateTime(dataReader["ImportDateFileCreationDate"]);
+                        student.PreprogramIndicator = Convert.ToString(dataReader["PreprogramIndicator"]);
+                        student.MajorProgramEnrollment = Convert.ToString(dataReader["MajorProgramEnrollmentName"]);
+                        student.FileCreatedDate = Convert.ToDateTime(dataReader["FileCreationDate"]);
+                        studentList.Add(student);
+
+                    }
+                }
+
+            }
+        }
+        return studentList;
+    }
+
+     
+
+    public Collection<Student> GetAllStudentByTermCodeofProgramEnrollment(string termCodeofProgramEnrollment)
+    {
+        Collection<Student> studentList = new Collection<Student>();
+        using (OdbcConnection connection = new OdbcConnection(connectionString))
+        {
+            using (OdbcCommand command = new OdbcCommand())
+            {
+                command.Connection = connection;
+                command.CommandText = "{CALL AllStudent_ByTermCodeofProgramEnrollment(?)}";
+                command.CommandType = CommandType.StoredProcedure;
+
+                //Set Parameter Value
+                command.Parameters.AddWithValue("@TermCodeofProgramEnrollment", termCodeofProgramEnrollment);
+                //Open connection
+                connection.Open();
+                //Read using reader
+                using (OdbcDataReader dataReader = command.ExecuteReader())
+                {
+                    //Question q = new Question();
+                    Student student;
+                    while (dataReader.Read())
+                    {
+                        student = new Student();
+                        student.StudentOID = Convert.ToInt32(dataReader["StudentOID"]);
+                        string strName = Convert.ToString(dataReader["BannerStudentName"]);
+                        string[] strfname = strName.Split(',');
+                        string strFirstName = strfname[1];
+                        string strLastname = strfname[0];
+                        //student.LastName = strLastname;
+                        //.FirstName = strFirstName;
+                        student.FullName = strName;
+                        student.StudentID = Convert.ToString(dataReader["BannerStudentIDNumber"]);
+                        student.ProgramEnrollment = Convert.ToString(dataReader["TermCodeofProgramEnrollment"]);
+                        student.TimeIndicator = Convert.ToString(dataReader["FullTimeOrPartTimeIndicator"]);
+                        student.CumulativeGPA = Convert.ToDouble(dataReader["CumulativeGPA"]);
+                        student.CreditAttempted = Convert.ToDouble(dataReader["CreditsAttempted"]);
+                        student.CreditEarned = Convert.ToDouble(dataReader["CreditsEarned"]);
+                        student.PrealgebraTestScore = Convert.ToString(dataReader["LatestCompassPrealgebraTestScore"]);
+                        student.CompassalgebraTestScore = Convert.ToString(dataReader["LatestCompassAlgebraTestScore"]);
+                        student.CompassWrittingTestScore = Convert.ToString(dataReader["LatestCompassWritingTestScore"]);
+                        student.CompassReadingTestScore = Convert.ToString(dataReader["LatestCompassReadingTestScore"]);
+                        student.EnglishAssessmentScore = Convert.ToString(dataReader["LatestACTEnglishAssessmentScore"]);
+                        student.MathAssessmentScore = Convert.ToString(dataReader["LatestACTMathAssessmentScore"]);
+                        student.ReadingAssessmentScore = Convert.ToString(dataReader["LatestACTReadingAssessmentScore"]);
+                        student.ScienceAssessmentScore = Convert.ToString(dataReader["LatestACTScienceAssessmentScore"]);
+                        student.LatestTestingDate = Convert.ToDateTime(dataReader["LatestTestingDate"]);
+                        student.HighSchoolName = Convert.ToString(dataReader["HighSchoolName"]);
+                        student.HighSchoolGraduationDate = Convert.ToDateTime(dataReader["HighSchoolGraduationDate"]);
+                        student.HomeTelephoneNumber = Convert.ToString(dataReader["HomeTelephoneNumber"]);
+                        student.AddressOne = Convert.ToString(dataReader["MailingAddressLineOne"]);
+                        student.AddressTwo = Convert.ToString(dataReader["MailingAddressLineTwo"]);
+                        student.AddressThree = Convert.ToString(dataReader["MailingAddressLineThree"]);
+                        student.City = Convert.ToString(dataReader["City"]);
+                        student.State = Convert.ToString(dataReader["StateName"]);
+                        student.ZIPCode = Convert.ToString(dataReader["ZipCode"]);
+                        student.EmailAddress = Convert.ToString(dataReader["EmailAddress"]);
+                        student.ImportDate = Convert.ToDateTime(dataReader["ImportDateFileCreationDate"]);
+                        student.PreprogramIndicator = Convert.ToString(dataReader["PreprogramIndicator"]);
+                        student.MajorProgramEnrollment = Convert.ToString(dataReader["MajorProgramEnrollmentName"]);
+                        student.FileCreatedDate = Convert.ToDateTime(dataReader["FileCreationDate"]);
+                        studentList.Add(student);
+
+                    }
+                }
+
+            }
+        }
+        return studentList;
+    }
+    public Collection<Student> GetAllStudentByResultLetterSentTimes(int resultLetterSentTimes)
+    {
+        Collection<Student> studentList = new Collection<Student>();
+        using (OdbcConnection connection = new OdbcConnection(connectionString))
+        {
+            using (OdbcCommand command = new OdbcCommand())
+            {
+                command.Connection = connection;
+                command.CommandText = "{CALL AllStudent_ByResultLetterSentTimes(?)}";//
+                command.CommandType = CommandType.StoredProcedure;
+
+                //Set Parameter Value
+                command.Parameters.AddWithValue("@ResultLetterSentTimes", resultLetterSentTimes);
+                //Open connection
+                connection.Open();
+                //Read using reader
+                using (OdbcDataReader dataReader = command.ExecuteReader())
+                {
+                    //Question q = new Question();
+                    Student student;
+                    while (dataReader.Read())
+                    {
+                        student = new Student();
+                        student.StudentOID = Convert.ToInt32(dataReader["StudentOID"]);
+                        string strName = Convert.ToString(dataReader["BannerStudentName"]);
+                        string[] strfname = strName.Split(',');
+                        string strFirstName = strfname[1];
+                        string strLastname = strfname[0];
+                        //student.LastName = strLastname;
+                        //.FirstName = strFirstName;
+                        student.FullName = strName;
+                        student.StudentID = Convert.ToString(dataReader["BannerStudentIDNumber"]);
+                        student.ProgramEnrollment = Convert.ToString(dataReader["TermCodeofProgramEnrollment"]);
+                        student.TimeIndicator = Convert.ToString(dataReader["FullTimeOrPartTimeIndicator"]);
+                        student.CumulativeGPA = Convert.ToDouble(dataReader["CumulativeGPA"]);
+                        student.CreditAttempted = Convert.ToDouble(dataReader["CreditsAttempted"]);
+                        student.CreditEarned = Convert.ToDouble(dataReader["CreditsEarned"]);
+                        student.PrealgebraTestScore = Convert.ToString(dataReader["LatestCompassPrealgebraTestScore"]);
+                        student.CompassalgebraTestScore = Convert.ToString(dataReader["LatestCompassAlgebraTestScore"]);
+                        student.CompassWrittingTestScore = Convert.ToString(dataReader["LatestCompassWritingTestScore"]);
+                        student.CompassReadingTestScore = Convert.ToString(dataReader["LatestCompassReadingTestScore"]);
+                        student.EnglishAssessmentScore = Convert.ToString(dataReader["LatestACTEnglishAssessmentScore"]);
+                        student.MathAssessmentScore = Convert.ToString(dataReader["LatestACTMathAssessmentScore"]);
+                        student.ReadingAssessmentScore = Convert.ToString(dataReader["LatestACTReadingAssessmentScore"]);
+                        student.ScienceAssessmentScore = Convert.ToString(dataReader["LatestACTScienceAssessmentScore"]);
+                        student.LatestTestingDate = Convert.ToDateTime(dataReader["LatestTestingDate"]);
+                        student.HighSchoolName = Convert.ToString(dataReader["HighSchoolName"]);
+                        student.HighSchoolGraduationDate = Convert.ToDateTime(dataReader["HighSchoolGraduationDate"]);
+                        student.HomeTelephoneNumber = Convert.ToString(dataReader["HomeTelephoneNumber"]);
+                        student.AddressOne = Convert.ToString(dataReader["MailingAddressLineOne"]);
+                        student.AddressTwo = Convert.ToString(dataReader["MailingAddressLineTwo"]);
+                        student.AddressThree = Convert.ToString(dataReader["MailingAddressLineThree"]);
+                        student.City = Convert.ToString(dataReader["City"]);
+                        student.State = Convert.ToString(dataReader["StateName"]);
+                        student.ZIPCode = Convert.ToString(dataReader["ZipCode"]);
+                        student.EmailAddress = Convert.ToString(dataReader["EmailAddress"]);
+                        student.ImportDate = Convert.ToDateTime(dataReader["ImportDateFileCreationDate"]);
+                        student.PreprogramIndicator = Convert.ToString(dataReader["PreprogramIndicator"]);
+                        student.MajorProgramEnrollment = Convert.ToString(dataReader["MajorProgramEnrollmentName"]);
+                        student.FileCreatedDate = Convert.ToDateTime(dataReader["FileCreationDate"]);
+                        student.ResultLetterSentTimes = Convert.ToInt32(dataReader["ResultLetterSentTimes"]);
+
+                        studentList.Add(student);
+
+                    }
+                }
+
+            }
+        }
+        return studentList;
+    }
+
+    public bool UpdateAllStudentByResultLetterSentTimes(int resultLetterSentTimes)
+    {
+        bool result = false;
+        Collection<Student> studentList = new Collection<Student>();
+        using (OdbcConnection connection = new OdbcConnection(connectionString))
+        {
+            using (OdbcCommand command = new OdbcCommand())
+            {
+                command.Connection = connection;
+                command.CommandText = "{CALL AllStudent_Update_ByResultLetterSentTimes(?)}";//
+                command.CommandType = CommandType.StoredProcedure;
+
+                //Set Parameter Value
+                command.Parameters.AddWithValue("@ResultLetterSentTimes", resultLetterSentTimes);
+                //Open connection
+                connection.Open();
+                int n = command.ExecuteNonQuery();
+                if (n > 0)
+                    result = true;
+                else
+                    result = false;
+            }
+        }
+        return result;
+    }
+
+
+    public Student GetStudentByStudentBannerID(string BannerID)
+    {
+        //Collection<Student> studentList = new Collection<Student>();
+        Student student=null;
+        using (OdbcConnection connection = new OdbcConnection(connectionString))
+        {
+            using (OdbcCommand command = new OdbcCommand())
+            {
+
+                command.Connection = connection;
+                command.CommandText = "{CALL Student_ByStudentBannerID(?)}";
+                command.CommandType = CommandType.StoredProcedure;
+
+                //Set Parameter Value
+                command.Parameters.AddWithValue("@BannerID", BannerID);
+                //Open connection
+                connection.Open();
+                //Read using reader
+                using (OdbcDataReader dataReader = command.ExecuteReader())
+                {
+                    //Question q = new Question();
+                    if(dataReader.Read())
+                    //while (dataReader.Read())
+                    {
+                        student = new Student();
+                        student.StudentOID = Convert.ToInt32(dataReader["StudentOID"]);
+                        string strName = Convert.ToString(dataReader["BannerStudentName"]);
+                        string[] strfname = strName.Split(',');
+                        string strFirstName = strfname[1];
+                        string strLastname = strfname[0];
+                        //student.LastName = strLastname;
+                        //.FirstName = strFirstName;
+                        student.FullName = strName;
+                        student.StudentID = Convert.ToString(dataReader["BannerStudentIDNumber"]);
+                        student.ProgramEnrollment = Convert.ToString(dataReader["TermCodeofProgramEnrollment"]);
+                        student.TimeIndicator = Convert.ToString(dataReader["FullTimeOrPartTimeIndicator"]);
+                        student.CumulativeGPA = Convert.ToDouble(dataReader["CumulativeGPA"]);
+                        student.CreditAttempted = Convert.ToDouble(dataReader["CreditsAttempted"]);
+                        student.CreditEarned = Convert.ToDouble(dataReader["CreditsEarned"]);
+                        student.PrealgebraTestScore = Convert.ToString(dataReader["LatestCompassPrealgebraTestScore"]);
+                        student.CompassalgebraTestScore = Convert.ToString(dataReader["LatestCompassAlgebraTestScore"]);
+                        student.CompassWrittingTestScore = Convert.ToString(dataReader["LatestCompassWritingTestScore"]);
+                        student.CompassReadingTestScore = Convert.ToString(dataReader["LatestCompassReadingTestScore"]);
+                        student.EnglishAssessmentScore = Convert.ToString(dataReader["LatestACTEnglishAssessmentScore"]);
+                        student.MathAssessmentScore = Convert.ToString(dataReader["LatestACTMathAssessmentScore"]);
+                        student.ReadingAssessmentScore = Convert.ToString(dataReader["LatestACTReadingAssessmentScore"]);
+                        student.ScienceAssessmentScore = Convert.ToString(dataReader["LatestACTScienceAssessmentScore"]);
+                        student.LatestTestingDate = Convert.ToDateTime(dataReader["LatestTestingDate"]);
+                        student.HighSchoolName = Convert.ToString(dataReader["HighSchoolName"]);
+                        student.HighSchoolGraduationDate = Convert.ToDateTime(dataReader["HighSchoolGraduationDate"]);
+                        student.HomeTelephoneNumber = Convert.ToString(dataReader["HomeTelephoneNumber"]);
+                        student.AddressOne = Convert.ToString(dataReader["MailingAddressLineOne"]);
+                        student.AddressTwo = Convert.ToString(dataReader["MailingAddressLineTwo"]);
+                        student.AddressThree = Convert.ToString(dataReader["MailingAddressLineThree"]);
+                        student.City = Convert.ToString(dataReader["City"]);
+                        student.State = Convert.ToString(dataReader["StateName"]);
+                        student.ZIPCode = Convert.ToString(dataReader["ZipCode"]);
+                        student.EmailAddress = Convert.ToString(dataReader["EmailAddress"]);
+                        student.ImportDate = Convert.ToDateTime(dataReader["ImportDateFileCreationDate"]);
+                        student.PreprogramIndicator = Convert.ToString(dataReader["PreprogramIndicator"]);
+                        student.MajorProgramEnrollment = Convert.ToString(dataReader["MajorProgramEnrollmentName"]);
+                        student.FileCreatedDate = Convert.ToDateTime(dataReader["FileCreationDate"]);
+                       // studentList.Add(student);
+
+                    }
+                }
+
+            }
+        }
+        return student;
+    }
+
+    public Student GetStudentByBannerIDAndStudentName(string BannerID, string StudentName)
+    {
+        //Collection<Student> studentList = new Collection<Student>();
+        Student student = null;
+        using (OdbcConnection connection = new OdbcConnection(connectionString))
+        {
+            using (OdbcCommand command = new OdbcCommand())
+            {
+
+                command.Connection = connection;
+                command.CommandText = "{CALL Student_ByBannerAndStudentName(?,?)}";
+                command.CommandType = CommandType.StoredProcedure;
+
+                //Set Parameter Value
+                command.Parameters.AddWithValue("@BannerID", BannerID);
+                command.Parameters.AddWithValue("@StudentName", StudentName);
+                //Open connection
+                connection.Open();
+                //Read using reader
+                using (OdbcDataReader dataReader = command.ExecuteReader())
+                {
+                    //Question q = new Question();
+                    dataReader.Read();
+                    //while (dataReader.Read())
+                    {
+                        student = new Student();
+                        student.StudentOID = Convert.ToInt32(dataReader["StudentOID"]);
+                        string strName = Convert.ToString(dataReader["BannerStudentName"]);
+                        string[] strfname = strName.Split(',');
+                        string strFirstName = strfname[1];
+                        string strLastname = strfname[0];
+                        //student.LastName = strLastname;
+                        //.FirstName = strFirstName;
+                        student.FullName = strName;
+                        student.StudentID = Convert.ToString(dataReader["BannerStudentIDNumber"]);
+                        student.ProgramEnrollment = Convert.ToString(dataReader["TermCodeofProgramEnrollment"]);
+                        student.TimeIndicator = Convert.ToString(dataReader["FullTimeOrPartTimeIndicator"]);
+                        student.CumulativeGPA = Convert.ToDouble(dataReader["CumulativeGPA"]);
+                        student.CreditAttempted = Convert.ToDouble(dataReader["CreditsAttempted"]);
+                        student.CreditEarned = Convert.ToDouble(dataReader["CreditsEarned"]);
+                        student.PrealgebraTestScore = Convert.ToString(dataReader["LatestCompassPrealgebraTestScore"]);
+                        student.CompassalgebraTestScore = Convert.ToString(dataReader["LatestCompassAlgebraTestScore"]);
+                        student.CompassWrittingTestScore = Convert.ToString(dataReader["LatestCompassWritingTestScore"]);
+                        student.CompassReadingTestScore = Convert.ToString(dataReader["LatestCompassReadingTestScore"]);
+                        student.EnglishAssessmentScore = Convert.ToString(dataReader["LatestACTEnglishAssessmentScore"]);
+                        student.MathAssessmentScore = Convert.ToString(dataReader["LatestACTMathAssessmentScore"]);
+                        student.ReadingAssessmentScore = Convert.ToString(dataReader["LatestACTReadingAssessmentScore"]);
+                        student.ScienceAssessmentScore = Convert.ToString(dataReader["LatestACTScienceAssessmentScore"]);
+                        student.LatestTestingDate = Convert.ToDateTime(dataReader["LatestTestingDate"]);
+                        student.HighSchoolName = Convert.ToString(dataReader["HighSchoolName"]);
+                        student.HighSchoolGraduationDate = Convert.ToDateTime(dataReader["HighSchoolGraduationDate"]);
+                        student.HomeTelephoneNumber = Convert.ToString(dataReader["HomeTelephoneNumber"]);
+                        student.AddressOne = Convert.ToString(dataReader["MailingAddressLineOne"]);
+                        student.AddressTwo = Convert.ToString(dataReader["MailingAddressLineTwo"]);
+                        student.AddressThree = Convert.ToString(dataReader["MailingAddressLineThree"]);
+                        student.City = Convert.ToString(dataReader["City"]);
+                        student.State = Convert.ToString(dataReader["StateName"]);
+                        student.ZIPCode = Convert.ToString(dataReader["ZipCode"]);
+                        student.EmailAddress = Convert.ToString(dataReader["EmailAddress"]);
+                        student.ImportDate = Convert.ToDateTime(dataReader["ImportDateFileCreationDate"]);
+                        student.PreprogramIndicator = Convert.ToString(dataReader["PreprogramIndicator"]);
+                        student.MajorProgramEnrollment = Convert.ToString(dataReader["MajorProgramEnrollmentName"]);
+                        student.FileCreatedDate = Convert.ToDateTime(dataReader["FileCreationDate"]);
+                        // studentList.Add(student);
+
+                    }
+                }
+
+            }
+        }
+        return student;
+    }
+
+    public int  GetStudentOIDByStudentBannerID(string BannerOID)
+    {
+        //Collection<Student> studentList = new Collection<Student>();
+        Student student = null;
+        int StudentOID=0;
+        using (OdbcConnection connection = new OdbcConnection(connectionString))
+        {
+            using (OdbcCommand command = new OdbcCommand())
+            {
+                //StudentOID_ByStudentBannerID
+                command.Connection = connection;
+                command.CommandText = "{CALL StudentOID_ByStudentBannerID(?)}";
+                command.CommandType = CommandType.StoredProcedure;
+
+                //Set Parameter Value
+                command.Parameters.AddWithValue("@BannerOID", BannerOID);
+                //Open connection
+                connection.Open();
+                //Read using reader
+                using (OdbcDataReader dataReader = command.ExecuteReader())
+                {
+                    //Question q = new Question();
+                    dataReader.Read();
+                    //while (dataReader.Read())
+                    {
+                        student = new Student();
+                        try
+                        {
+                            StudentOID =  Convert.ToInt32(dataReader["StudentOID"]);
+                        }
+                        catch (Exception ex)
+                        {
+                            StudentOID = 0;
+                        }
+                        // studentList.Add(student);
+
+                    }
+                }
+
+            }
+        }
+        return StudentOID;
+    }
+
+    public string GetStudentIDByStudentBannerOID(int  BannerOID)
+    {
+        //Collection<Student> studentList = new Collection<Student>();
+        Student student = null;
+        string  StudentID=null ;
+        using (OdbcConnection connection = new OdbcConnection(connectionString))
+        {
+            using (OdbcCommand command = new OdbcCommand())
+            {
+
+                command.Connection = connection;
+                command.CommandText = "{CALL StudentID_ByStudentBannerOID(?)}";
+                command.CommandType = CommandType.StoredProcedure;
+
+                //Set Parameter Value
+                command.Parameters.AddWithValue("@BannerOID", BannerOID);
+                //Open connection
+                connection.Open();
+                //Read using reader
+                using (OdbcDataReader dataReader = command.ExecuteReader())
+                {
+                    //Question q = new Question();
+                    if(dataReader.Read())
+                    //while (dataReader.Read())
+                    {
+                        student = new Student();
+                        StudentID = Convert.ToString(dataReader["BannerStudentIDNumber"]);
+                        // studentList.Add(student);
+
+                    }
+                }
+
+            }
+        }
+        return StudentID;
+    }
+
+    public bool UpdateStudent(Student std)
+    { 
+    bool result = false;
+
+        using (OdbcConnection connection = new OdbcConnection(connectionString))
+        {
+            using (OdbcCommand command = new OdbcCommand())
+            {
+                //command.Connection = connection;
+                ////command.CommandText = "UPDATE dbo.Users SET " + "UserName='" + userName + "', " + " FirstName='" + firstName + "', " + " MiddleName='" + middleName + "'," + "LastName='" + lastName + "'," + "EmailID='" + emailID + "'" + " where UserID='" + userid + "' ";
+                //command.CommandText = "INSERT INTO Users (UserName, FirstName, LastName, MiddleName, EmailID) VALUES (" + "'" + userName + "','" + firstName + "','" + lastName + "','" + middleName + "','" + emailID + "')";
+                //connection.Open();
+                //command.ExecuteNonQuery();
+
+                command.Connection = connection;
+                command.CommandText = "{CALL Student_Update(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+                command.CommandType = CommandType.StoredProcedure;
+
+
+                command.Parameters.AddWithValue("@StudentOID", std.StudentOID);
+                command.Parameters.AddWithValue("@BannerStudentName", std.FullName);
+                command.Parameters.AddWithValue("@BannerStudentIDNumber", std.StudentID);
+                command.Parameters.AddWithValue("@TermCodeofProgramEnrollment", std.ProgramEnrollment);
+                command.Parameters.AddWithValue("@FullTimeOrPartTimeIndicator", std.TimeIndicator);
+                command.Parameters.AddWithValue("@CumulativeGPA", std.CumulativeGPA);
+                command.Parameters.AddWithValue("@CreditsAttempted", std.CreditAttempted);
+                command.Parameters.AddWithValue("@CreditsEarned", std.CreditEarned);
+                command.Parameters.AddWithValue("@LatestCompassPrealgebraTestScore", std.PrealgebraTestScore);
+                command.Parameters.AddWithValue("@LatestCompassAlgebraTestScore", std.CompassalgebraTestScore);
+                command.Parameters.AddWithValue("@LatestCompassWritingTestScore", std.CompassWrittingTestScore);
+                command.Parameters.AddWithValue("@LatestCompassReadingTestScore", std.CompassReadingTestScore);
+                command.Parameters.AddWithValue("@LatestACTEnglishAssessmentScore", std.EnglishAssessmentScore);
+                command.Parameters.AddWithValue("@LatestACTMathAssessmentScore", std.MathAssessmentScore);
+                command.Parameters.AddWithValue("@LatestACTReadingAssessmentScore", std.ReadingAssessmentScore);
+                command.Parameters.AddWithValue("@LatestACTScienceAssessmentScore", std.ScienceAssessmentScore);
+                command.Parameters.AddWithValue("@LatestTestingDate", std.LatestTestingDate);
+                command.Parameters.AddWithValue("@HighSchoolName", std.HighSchoolName);
+                command.Parameters.AddWithValue("@HighSchoolGraduationDate", std.HighSchoolGraduationDate);
+                command.Parameters.AddWithValue("@HomeTelephoneNumber", std.HomeTelephoneNumber);
+                command.Parameters.AddWithValue("@MailingAddressLineOne", std.AddressOne);
+                command.Parameters.AddWithValue("@MailingAddressLineTwo", std.AddressTwo);
+                command.Parameters.AddWithValue("@MailingAddressLineThree", std.AddressThree);
+                command.Parameters.AddWithValue("@City", std.City);
+                command.Parameters.AddWithValue("@StateName", std.State);
+                command.Parameters.AddWithValue("@ZipCode", std.ZIPCode);
+                command.Parameters.AddWithValue("@EmailAddress", std.EmailAddress);
+                command.Parameters.AddWithValue("@ImportDateFileCreationDate", std.ImportDate);
+                command.Parameters.AddWithValue("@PreprogramIndicator", std.PreprogramIndicator);
+                command.Parameters.AddWithValue("@MajorProgramEnrollmentName", std.MajorProgramEnrollment);
+                
+                connection.Open();
+                int n = command.ExecuteNonQuery();
+                if (n == 1)
+                    result = true;
+                else
+                    result = false;
+            }
+        }
+
+        return result;
+    }
+
+    public Student GetStudentByOID(int SOID)
+    {
+        
+        Student student = this;
+        using (OdbcConnection connection = new OdbcConnection(connectionString))
+        {
+            using (OdbcCommand command = new OdbcCommand())
+            {
+
+                command.Connection = connection;
+                command.CommandText = "{CALL GET_StudentByOID(?)}";
+                command.CommandType = CommandType.StoredProcedure;
+
+                //Set Parameter Value
+                command.Parameters.AddWithValue("@SOID", SOID);
+                //Open connection
+                connection.Open();
+                //Read using reader
+                using (OdbcDataReader dataReader = command.ExecuteReader())
+                {
+                    //Question q = new Question();
+                    // Student  student;
+                    // while (dataReader.Read())
+                    if (dataReader.Read())
+                    {
+                        //student = new Student();
+                        student.StudentOID = Convert.ToInt32(dataReader["StudentOID"]);
+                        string strName = Convert.ToString(dataReader["BannerStudentName"]);
+                        string[] strfname = strName.Split(',');
+                        string strFirstName = strfname[1];
+                        string strLastname = strfname[0];
+                        student.LastName = strLastname;
+                        student.FirstName = strFirstName;
+                        student.FullName = strName;
+                        student.StudentID = Convert.ToString(dataReader["BannerStudentIDNumber"]);
+                        student.ProgramEnrollment = Convert.ToString(dataReader["TermCodeofProgramEnrollment"]);
+                        student.TimeIndicator = Convert.ToString(dataReader["FullTimeOrPartTimeIndicator"]);
+                        student.CumulativeGPA = Convert.ToDouble(dataReader["CumulativeGPA"]);
+                        student.CreditAttempted = Convert.ToDouble(dataReader["CreditsAttempted"]);
+                        student.CreditEarned = Convert.ToDouble(dataReader["CreditsEarned"]);
+                        student.PrealgebraTestScore = Convert.ToString(dataReader["LatestCompassPrealgebraTestScore"]);
+                        student.CompassalgebraTestScore = Convert.ToString(dataReader["LatestCompassAlgebraTestScore"]);
+                        student.CompassWrittingTestScore = Convert.ToString(dataReader["LatestCompassWritingTestScore"]);
+                        student.CompassReadingTestScore = Convert.ToString(dataReader["LatestCompassReadingTestScore"]);
+                        student.EnglishAssessmentScore = Convert.ToString(dataReader["LatestACTEnglishAssessmentScore"]);
+                        student.MathAssessmentScore = Convert.ToString(dataReader["LatestACTMathAssessmentScore"]);
+                        student.ReadingAssessmentScore = Convert.ToString(dataReader["LatestACTReadingAssessmentScore"]);
+                        student.ScienceAssessmentScore = Convert.ToString(dataReader["LatestACTScienceAssessmentScore"]);
+                        student.LatestTestingDate = Convert.ToDateTime(dataReader["LatestTestingDate"]);
+                        student.HighSchoolName = Convert.ToString(dataReader["HighSchoolName"]);
+                        student.HighSchoolGraduationDate = Convert.ToDateTime(dataReader["HighSchoolGraduationDate"]);
+                        student.HomeTelephoneNumber = Convert.ToString(dataReader["HomeTelephoneNumber"]);
+                        student.AddressOne = Convert.ToString(dataReader["MailingAddressLineOne"]);
+                        student.AddressTwo = Convert.ToString(dataReader["MailingAddressLineTwo"]);
+                        student.AddressThree = Convert.ToString(dataReader["MailingAddressLineThree"]);
+                        student.City = Convert.ToString(dataReader["City"]);
+                        student.State = Convert.ToString(dataReader["StateName"]);
+                        student.ZIPCode = Convert.ToString(dataReader["ZipCode"]);
+                        student.EmailAddress = Convert.ToString(dataReader["EmailAddress"]);
+                        student.ImportDate = Convert.ToDateTime(dataReader["ImportDateFileCreationDate"]);
+                        student.PreprogramIndicator = Convert.ToString(dataReader["PreprogramIndicator"]);
+                        student.MajorProgramEnrollment = Convert.ToString(dataReader["MajorProgramEnrollmentName"]);
+                        student.FileCreatedDate = Convert.ToDateTime(dataReader["FileCreationDate"]);
+                        student.NTO = Convert.ToString(dataReader["NTO"]);
+                        student.MC = Convert.ToString(dataReader["MC"]);
+                        student.PELL = Convert.ToString(dataReader["PELL"]);
+                        student.RVP = Convert.ToString(dataReader["RVP"]);
+                        student.ALLERT = Convert.ToString(dataReader["ALLERT"]);
+                        // studentList.Add(student);
+
+                    }
+                }
+
+            }
+        }
+        return student;
+    }
+}

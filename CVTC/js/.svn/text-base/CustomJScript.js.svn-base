@@ -1,0 +1,4 @@
+﻿function ReloadMenu()
+{
+    $('#west-grid').trigger("reloadGrid");
+}

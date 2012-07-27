@@ -1,0 +1,47 @@
+﻿using System;
+using System.Collections;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Xml.Linq;
+
+public partial class pg_answer_home : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        int aid = (Request.QueryString["aid"] == null) ? 0 : Convert.ToInt32(Request.QueryString["aid"].ToString());
+        Session["aoid"] = aid;
+
+    }
+    protected void ButtonSubmit_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            string aid=(Session["aoid"]!=null)? Session["aoid"].ToString():"0";
+
+            string firstName, lastName, bannerID,studentName;
+            firstName = TextBoxFirstName.Text;
+            lastName = TextBoxLastName.Text;
+            bannerID = TextBoxBannerID.Text;
+            studentName = lastName + ", " + firstName;
+            Student std = new Student();
+            std = std.GetStudentByBannerIDAndStudentName(bannerID,studentName);
+            if (std !=null )
+            {                
+                Session["currentStd"]=std;
+                Response.Redirect("ExamHome.aspx?aid="+aid,true);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            LabelMsg.Text = "Student does not exist with your provided information";
+        }
+    }
+}

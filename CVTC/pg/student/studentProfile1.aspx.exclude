@@ -1,0 +1,597 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="studentProfile1.aspx.cs" Inherits="pg_student_studentProfile" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+<title>Student Profile</title>
+ <link rel="stylesheet" type="text/css" media="screen" href="../../themes/redmond/jquery-ui-1.8.1.custom.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="../../themes/ui.jqgrid.css" />
+
+    <link href="../../css/global-style.css" rel="stylesheet" type="text/css" />
+    <script src="../../js/jquery.js" type="text/javascript"></script> 
+    <script src="../../js/grid.locale-en.js" type="text/javascript"></script> 
+    <script src="../../js/jquery.jqGrid.min.js" type="text/javascript"></script>
+     <script src="../../js/thickbox.js" type="text/javascript"></script>
+    <link href="../../themes/thickbox.css" rel="stylesheet" type="text/css" />
+    
+   
+    
+  <script type="text/javascript">
+       
+      
+//      $(function() {
+//      $("#CoursesGrid").jqGrid({
+//              url:'CourseHandler.ashx',//''UserHandler.ashx',
+//              datatype: 'json',
+//             height:100,
+//              width:600,
+//              colNames: ['CourseOID', 'NAME', 'ID', 'TERMEFF', 'CRSENO', 'CRSETITLE', 'FINALGRDE', 'CRSETERM', 'DeliveryMethod', 'ImportDate'], 
+//              colModel: [
+//                        { name: 'CourseOID', index: 'CourseID', width: 100, hidden: true, sortable: false },
+//                        { name: 'NAME', width: 100, editable: false },
+//                        { name: 'ID', width: 100, editable: false },
+//                        { name: 'TERMEFF', width: 100, sortable: true, editable: false },
+//                        { name: 'CRSENO', width: 100, sortable: true, editable: false },
+//                        { name: 'CRSETITLE', width: 100, sortable: true, editable: false },
+//                        { name: 'FINALGRDE', width: 100, sortable: true, editable: false },
+//                        { name: 'CRSETERM', width: 100, sortable: true, editable: false },
+//                        { name: 'DeliveryMethod', width: 100, sortable: true, editable: false },
+//                        { name: 'ImportDate', width: 100, sortable: true, editable: false }      
+//                    ],
+//              rowNum: 10,
+//              rowList: [10, 20, 30],
+//              pager: '#CoursesGridPager',
+//              sortname: 'CourseOID',
+//              viewrecords: true,
+//              sortorder: 'asc',
+//              altRows: true,
+//              //editurl: 'UserHandler.ashx',
+//              caption: 'Courses Management '
+//          });
+
+//          $("#CoursesGrid").jqGrid('navGrid', '#CoursesGridPager', { edit: false, add: false, del: false });
+
+//          options = { autosearch: true };
+//          $("#CoursesGrid").filterToolbar(options);
+
+//          var sgrid = $("#CoursesGrid")[0];
+//          sgrid.triggerToolbar();
+
+
+//          //$("#myButton").click(function () {
+//          //$("#UsersGrid").setColumns({ 'UserOID': '', 'UserName': '' });
+//          //  return false;
+//          //});
+
+
+//      });
+    </script>
+  
+   
+  <script type="text/javascript">
+       
+//      $(function() {
+//      $("#InterventionsGrid").jqGrid({
+//              url:'',//''UserHandler.ashx',
+//              datatype: 'json',
+//              height: 100,
+//              width: 1050,
+//              colNames: ['Datestamp', 'Banner ID', 'Participating', 'Action Date', 'Sponsor(Avoc.)', 'Criteria Type(Domain)', 'Outcome Type(Interventions)', 'Prescribed', 'Completed', 'Email','Telephone','In Person','Hand-Off','Contact Date','Comment'], 
+//              colModel: [
+//                        { name: 'Datestamp', index: 'Banner ID', width: 90, hidden: false,editable:false, sortable: false },
+//                        { name: 'Banner ID', width: 80,editable:true, editable: false },
+//                        { name: 'Participating', width: 80,editable:true,edittype:"checkbox",editoptions:{value:"Yes:No"}},
+//                        { name: 'Action Date', width: 100, sortable: true, editable: true ,editoptions:{size:25}},
+//                        { name: 'Sponsor(Avoc.)', width: 100, sortable: true, editable: true ,edittype:"select",editoptions:{value:"AD:Advertisement;RE:Bryan Richard"}},
+//                        { name: 'Criteria Type(Domain)', width: 100, sortable: true, editable: true ,edittype:"select",editoptions:{value:"AD:Advertisement;FS:Family Support"}},
+//                        { name: 'Outcome Type(Interventions)', width: 100, sortable: true, editable: true ,edittype:"select",editoptions:{value:"DE:To Be Determined;CO:Counselling"}},
+//                        { name: 'Prescribed', width: 100, sortable: true, editable:true,edittype:"checkbox",editoptions:{value:"Yes:No"}},
+//                        { name: 'Completed', width: 100, sortable: true, editable:true,edittype:"checkbox",editoptions:{value:"Yes:No"}},
+//                        { name: 'Email', width: 100, sortable: true,editable:true,edittype:"checkbox",editoptions:{value:"Yes:No"}},
+//                        { name: 'Telephone', width: 100, sortable: true, editable:true,edittype:"checkbox",editoptions:{value:"Yes:No"}},
+//                        { name: 'In Person', width: 100, sortable: true, editable:true,edittype:"checkbox",editoptions:{value:"Yes:No"}},
+//                        { name: 'Hand-Off', width: 100, sortable: true, editable:true,edittype:"checkbox",editoptions:{value:"Yes:No"}},
+//                        { name: 'Contact Date', width: 100, sortable: true, editable:true,edittype:"checkbox",editoptions:{value:"Yes:No"}},
+//                        { name: 'Comment', width: 100, sortable: true,editable: true,edittype:"textarea", editoptions:{rows:"3",cols:"40"}}
+//                    ],
+//              rowNum: 5,
+//              rowList: [10, 20, 30],
+//              pager: '#InterventionsGridPager',
+//              sortname: 'Banner ID',
+//              viewrecords: true,
+//              sortorder: 'asc',
+//              altRows: true,
+//              //editurl: 'UserHandler.ashx',
+//              caption: 'Interventions'
+//          });
+
+//          $("#CoursesGrid").jqGrid('navGrid', '#CoursesGridPager', { edit: false, add: false, del: false });
+//          
+//      });
+
+    </script>
+   
+   
+  <script type="text/javascript">
+       
+//      $(function() {
+//      $("#SectionGrid").jqGrid({
+//              url:'',//''UserHandler.ashx',
+//              datatype: 'json',
+//              height: 100,
+//              width:600,
+//              colNames: ['SectionOID','Section Name', 'Total Question', 'Passing Total', 'Total Flag','Total Flag Point'], 
+//              colModel: [
+//                        { name: 'SectionOID', index: 'SectionOID', width: 100, hidden: true, sortable: false },
+//                        { name: 'Section Name', width: 100, hidden: false , sortable: false },
+//                        { name: 'Total Question', width: 200, editable: false },
+//                        { name: 'Passing Total', width: 100, editable: false },
+//                        { name: 'Total Flag', width: 100, sortable: false, editable: false },
+//                        { name: 'Total Flag Point', width: 100, sortable: false, editable: false }
+//                        ],
+//              rowNum: 10,
+//              rowList: [10, 20, 30],
+//              pager: '#SectionPager',
+//              sortname: 'SectionOID',
+//              viewrecords: true,
+//              sortorder: 'asc',
+//              altRows: true,
+//              //editurl: 'UserHandler.ashx',
+//              caption: 'Section Name(s) '
+//          });
+
+//          $("#SectionGrid").jqGrid('navGrid', '#SectionPager', { edit: false, add: false, del: false });
+
+//          
+//      });
+
+    </script>
+
+  
+  <style type="text/css">
+            .style7
+            {
+                width: 290px;
+            }
+            .style9
+            {
+                width: 225px;
+            }
+            .style15
+            {
+                width: 391px;
+            }
+            .style19
+            {
+                width: 291px;
+            }
+            .style25
+      {
+          width: 262px;
+      }
+        .style26
+      {
+          width: 322px;
+      }
+      .style27
+      {
+          width: 281px;
+      }
+        .style28
+      {
+          width: 290px;
+          height: 17px;
+      }
+      .style29
+      {
+          width: 262px;
+          height: 17px;
+      }
+      .style30
+      {
+          width: 225px;
+          height: 17px;
+      }
+      .style31
+      {
+          height: 17px;
+      }
+        </style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+     $('#btnPrescrip').live('click', function() {
+        $("#popupid").click();
+        });
+    });
+
+  </script>
+  
+ <%-- <script type="text/javascript">
+    function ShowDemographicsPopup(id) {
+        alert(id);
+        var ref = "../intervention/Prescription.aspx?keepThis=true&TB_iframe=true&height=480&width=900";
+        tb_show("View", ref, null);
+    }
+</script>--%>
+  
+</head>
+<body>
+<a href="../intervention/Prescription.aspx?keepThis=true&TB_iframe=true&height=400&width=550" class="thickbox" id="popupid" style="display:none;" >Dislay</a><form id="form1" runat="server">
+<div>
+    <asp:Button ID="Button1" runat="server" Text="Refresh" 
+        onclick="ButtonRefresh_Click" />
+    <asp:Label ID="LabelAllert" runat="server" Text="Allert"></asp:Label>&nbsp;&nbsp;&nbsp;
+    <asp:Label ID="LabelMC" runat="server" Text="Multicultural"></asp:Label>&nbsp;&nbsp;&nbsp;
+    <asp:Label ID="LabelPell" runat="server" Text="Pell"></asp:Label>&nbsp;&nbsp;&nbsp;
+    <asp:Label ID="LabelNTO" runat="server" Text="NTO"></asp:Label>&nbsp;&nbsp;&nbsp;
+    <asp:Label ID="LabelRVP" runat="server" Text="RVP"></asp:Label>&nbsp;&nbsp;&nbsp;
+    </div>
+   <div>
+       <b> Select Assesment:</b>
+      <asp:DropDownList ID="ddlAssesment" runat="server" Height="20px" Width="174px" 
+           AutoPostBack="True" DataMember="AssessmentName" DataValueField="AssessmentName" 
+           ToolTip="Select Assesment Name" 
+           onselectedindexchanged="ddlAssesment_SelectedIndexChanged" 
+           Font-Names="Calibri"> </asp:DropDownList>          
+       <br />
+          <hr style="border-top:thin solid black; width:1001px; height: -14px; border-left-color: inherit; border-right-color: inherit; border-bottom-color: inherit; border-left-style: none; border-left-width: 0px; border-right-style: none; border-right-width: 0px; border-bottom-style: none; border-bottom-width: 0px;" 
+           align="left" />  
+   </div>
+   <div>
+   <table style="width: 1006px" >
+   <tr >
+   <td >  
+       <asp:LinkButton ID="lbtnPrev" runat="server" onclick="lbtnPrev_Click" 
+           Font-Names="Calibri"><b >Previous Student</b></asp:LinkButton>  
+   </td>
+   <td >
+   <b >Studet Name:</b>
+   <asp:Label ID="lblStudentName" runat="server" Width="173px" ReadOnly="True"></asp:Label>
+    </td>
+      <td >
+      <b >ID#</b>
+          <asp:Label ID="lblID" runat="server" Width="107px" ReadOnly="True"></asp:Label>
+      </td>
+      <td>
+      <b >Telephone:</b>
+          <asp:Label ID="lblTelephone" runat="server" Width="102px" ReadOnly="True"></asp:Label>     
+      </td>
+      <td>
+      <b>Imported:</b>
+      </td>
+      <td >
+      <asp:LinkButton ID="lbtnNext" runat="server" onclick="lbtnNext_Click" 
+              Font-Names="Calibri"><b >Next Student</b></asp:LinkButton>
+      </td>
+   </tr>
+   </table>
+    <hr style="border-top:thin solid black; width:1001px; height: -14px; border-left-color: inherit; border-right-color: inherit; border-bottom-color: inherit; border-left-style: none; border-left-width: 0px; border-right-style: none; border-right-width: 0px; border-bottom-style: none; border-bottom-width: 0px;" 
+           align="left" /> 
+   </div>
+   <div >
+   <table >
+   <tr >
+   <td class="style19">
+   <b>CVTC Program:</b>
+   <asp:Label ID ="lblCVTCProgram" runat="server" ReadOnly ="true " Width="150px"  ></asp:Label>
+   </td>
+   <td >
+   
+   </td>
+   <td>
+   
+   </td>
+   <td>
+   
+       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+       &nbsp;</td>
+   <td class="style15" >
+   <b>Pre Program:</b>
+   <asp:Label ID ="lblPreProgram" runat="server" ReadOnly ="true " Width="156px"  ></asp:Label>
+   </td>
+   </tr>
+  
+   </table>
+    <br />
+   <hr style="border-top:thin solid black; width:1001px; height: -14px; border-left-color: inherit; border-right-color: inherit; border-bottom-color: inherit; border-left-style: none; border-left-width: 0px; border-right-style: none; border-right-width: 0px; border-bottom-style: none; border-bottom-width: 0px;" 
+           align="left" /> 
+   </div>
+
+   <table style="width: 1006px" >
+   <tr>
+   <td class="style7" valign="top">
+   
+       <div class="ContentHolder">
+      <div class="title-style-bar">
+        <h2> ISS Assessment Score</h2>
+      </div>
+      <div class="title-style-bar-body skyblue">
+      <table cellpadding="0" cellspacing="0" ><tr><td valign="top">
+       <asp:GridView ID="GridViewSection" runat="server" AutoGenerateColumns="False" 
+           onpageindexchanging="GridViewSection_PageIndexChanging" CssClass="datagrid-white"
+           Font-Names="Calibri" Font-Size="8pt">
+           <Columns>
+               <asp:BoundField DataField="SectionsName"  HeaderText="Section Name">
+                   <HeaderStyle HorizontalAlign="Left" VerticalAlign="Middle" />
+                   <ItemStyle Width="200px" />
+               </asp:BoundField>
+               <asp:BoundField DataField="Score" HeaderText="Score" />
+           </Columns>
+           
+           <HeaderStyle BackColor="#85B5D9" />
+           
+       </asp:GridView>
+       </td>
+       <td style="padding-left:10px;" valign="top">
+       <asp:GridView ID="GridViewScore" runat="server" AutoGenerateColumns="False"  CssClass="datagrid-white"          
+           Font-Names="Calibri" Font-Size="8pt">
+           <Columns>
+               <asp:BoundField DataField="SectionsName"  HeaderText="Question">
+                   <HeaderStyle HorizontalAlign="Left" VerticalAlign="Middle" />
+                   <ItemStyle Width="200px" />
+               </asp:BoundField>
+               <asp:BoundField DataField="Response" HeaderText="Answer" />
+           </Columns>
+           
+           <HeaderStyle BackColor="#85B5D9" />
+           
+       </asp:GridView>
+       </td>
+       </tr></table>
+       <asp:SqlDataSource ID="SqlDataSourceSection" runat="server"></asp:SqlDataSource>
+    </div>
+                </div>
+   </td>
+   <td class="style25" valign="top" >
+   <b>Testing Scores</b>
+       <br />
+      <b> ACT<br />
+       ACTE:</b>
+    <asp:Label ID="lblacte" runat="server" ReadOnly ="true" Width="89px"></asp:Label>
+       <br />
+       <b>ACTM:</b>
+       <asp:Label ID="lblactm" runat="server" ReadOnly ="true" Width="89px"></asp:Label>
+       <br />
+       <b>ACTR:</b>
+       <asp:Label ID="lblactr" runat="server" ReadOnly ="true" Width="89px"></asp:Label>
+       <br/>
+       <b>ACTS:</b>
+       <asp:Label ID="lblacts" runat="server" ReadOnly ="true" Width="89px"></asp:Label>
+       <br />
+       <b>CumulativeGPA:</b>
+    <asp:Label ID="lblCumulativeGPA" runat="server" ReadOnly ="true" Width="89px"></asp:Label>
+       </td>
+   <td class="style9" valign="top">
+   <b>Testing Scores</b>
+       <br />
+      <b> Compass<br />
+       Pre algebra:</b>
+    <asp:Label ID="lblprealgebra" runat="server" ReadOnly ="true" Width="89px"></asp:Label>
+       <br />
+       <b>Algebra:</b>
+       <asp:Label ID="lblalgebra" runat="server" ReadOnly ="true" Width="89px"></asp:Label>
+       <br />
+       <b>Reading:</b>
+       <asp:Label ID="lblreading" runat="server" ReadOnly ="true" Width="89px"></asp:Label>
+       <br/>
+       <b>Writting:</b>
+       <asp:Label ID="lblwritting" runat="server" ReadOnly ="true" Width="89px"></asp:Label>    
+       <br />
+       <b>Credit Attempted:</b>
+    <asp:Label ID="lblCreditAttempted" runat="server" ReadOnly ="true" Width="89px"></asp:Label>
+       </td>
+       <td valign="top"><b>Credit Earned:</b>
+    <asp:Label ID="lblCreditEarned" runat="server" ReadOnly ="true" Width="89px"></asp:Label></td>
+   </tr>
+   <tr>
+    <td class="style28" >  
+    </td>
+    <td class="style29" >
+    
+    </td>
+    <td class="style30">
+
+</td>
+    <td class="style31">
+
+</td> 
+   </tr>
+   </table>
+   
+   <table style="width:100%">
+   <tr><td></td><td></td></tr>
+   </table>
+   
+          <div >
+    <br/>
+   <hr style="border-top:thin solid black; width:1001px; height: -14px; border-left-color: inherit; border-right-color: inherit; border-bottom-color: inherit; border-left-style: none; border-left-width: 0px; border-right-style: none; border-right-width: 0px; border-bottom-style: none; border-bottom-width: 0px;" 
+           align="left" /> 
+           <br />
+   
+   </div>
+   <div>
+   <table style="width: 1006px" >
+   <tr>
+   <td class="style26" valign="top">
+   <b> High School Name:</b>
+    <asp:Label ID="lblHSname" runat="server" ReadOnly ="true" Width="176px"></asp:Label>
+       <br />
+       <b>HS Size:</b>
+       <asp:Label ID="lblHSSize" runat="server" ReadOnly ="true" Width="89px"></asp:Label>
+       <br />
+       <b>HS Program:</b>
+       <asp:Label ID="lblHSProgram" runat="server" ReadOnly ="true" Width="89px"></asp:Label>
+       <br/>
+       <b>HS Standard:</b>
+       <asp:Label ID="lblHSStandard" runat="server" ReadOnly ="true" Width="89px"></asp:Label>    
+       <br/>
+       <b>ISS Date:</b>
+       <asp:Label ID="lblISSdate" runat="server" ReadOnly ="true" Width="89px"></asp:Label>    
+   </td>
+   
+   <td class="style27" valign="top">
+    <b> Grad Date:</b>
+    <asp:Label ID="lblgraddate" runat="server" ReadOnly ="true" Width="89px"></asp:Label>
+       <br />
+       <b>HS Grade:</b>
+       <asp:Label ID="lblhsgrade" runat="server" ReadOnly ="true" Width="89px"></asp:Label>
+       <br />
+       <b>Term:</b>
+       <asp:Label ID="lblTerm" runat="server" ReadOnly ="true" Width="89px"></asp:Label>
+       <br/>
+       <b>Multi Culturual pell NTO:</b>
+       <asp:Label ID="lblMulti" runat="server" ReadOnly ="true" Width="89px"></asp:Label>    
+       <br/>
+       <b>Birth Date:</b>
+       <asp:Label ID="lblBirthDate" runat="server" ReadOnly ="true" Width="89px"></asp:Label>    
+   </td>
+   <td>
+       <asp:ScriptManager ID="ScriptManager1" runat="server">
+       </asp:ScriptManager>
+       <asp:UpdateProgress ID="UpdateProgress1" runat="server">
+       <ProgressTemplate>
+           <asp:Label ID="Label1" runat="server" Text="Loading" BorderColor="#666633"></asp:Label>
+       </ProgressTemplate>
+       </asp:UpdateProgress>
+       <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+       <ContentTemplate>
+       
+       <div class="ContentHolder">
+      <div class="title-style-bar">
+        <h2> Course</h2>
+      </div>
+      <div class="title-style-bar-body skyblue">
+     <asp:GridView ID="CourseGrid" runat="server" AutoGenerateColumns="False" 
+           AllowPaging ="True" onpageindexchanging="CourseGrid_PageIndexChanging" 
+               Height="206px" style="margin-left: 0px" PageSize="5" Font-Names="Calibri" 
+               Font-Size="8pt" Width="350px">
+       <Columns>
+           <asp:BoundField DataField="TermCodeofProgramEnrollment" HeaderText="Term">
+           </asp:BoundField>
+           <asp:BoundField DataField="CourseTitle" HeaderText="Course Title" >
+               <ItemStyle Width="600px" />
+           </asp:BoundField>
+           <asp:BoundField DataField="CourseNumber" HeaderText="Course ID" />
+           <asp:BoundField DataField="FinalGrade" HeaderText="Grade" />
+       </Columns>
+       <HeaderStyle BackColor="#85B5D9" />
+       </asp:GridView>
+    </div>
+    </div>
+    </ContentTemplate>
+       </asp:UpdatePanel>
+    </td>
+    </tr>
+    </table>
+     </br>
+   <hr style="border-top:thin solid black; width:1000px; height: 1px; border-left-color: inherit; border-right-color: inherit; border-bottom-color: inherit; border-left-style: none; border-left-width: 0px; border-right-style: none; border-right-width: 0px; border-bottom-style: none; border-bottom-width: 0px;" 
+           align="left" /> 
+   </div> 
+     
+   <div>  
+   <table style="width: 1006px" >
+   <tr>      
+  <td >
+  <div class="ContentHolder">
+      <div class="title-style-bar">
+        <h2> Interventoins</h2>
+      </div>
+      <div class="title-style-bar-body skyblue">
+      <asp:GridView ID="GridViewIntervention" runat="server" AllowPaging ="True" 
+          AutoGenerateColumns="False" CssClass="datagrid-white"
+          onpageindexchanging="GridViewIntervention_PageIndexChanging" 
+          onselectedindexchanging="GridViewIntervention_SelectedIndexChanging" 
+          Font-Names="Calibri" Font-Size="8pt" >
+          <Columns>
+              <asp:BoundField DataField="CreatedDate" HeaderText="Datestamp">
+                  <ItemStyle Height="18px" Width="135px" />
+              </asp:BoundField>
+              <asp:TemplateField HeaderText="Banner ID">
+                  <EditItemTemplate>
+                      <asp:TextBox ID="TextBox7" runat="server" Text='<%# Bind("BannerID") %>'></asp:TextBox>
+                  </EditItemTemplate>
+                  <ItemTemplate>
+                      <a href='../intervention/Prescription.aspx?poid=<%# Eval("PrescriptionOID")%>&keepThis=true&TB_iframe=true&height=400&width=550'
+                            class="thickbox" id="insidegrid"><asp:Label ID="Label2" runat="server" Text='<%# Bind("BannerID") %>' Font-Underline="True"></asp:Label></a>
+                  </ItemTemplate>
+              </asp:TemplateField>
+              <asp:BoundField HeaderText="Participating" DataField="Participating" />
+              <asp:BoundField DataField="LatestActionDate" HeaderText="Action Date" />
+              <asp:BoundField HeaderText="Sponsor(Avoc.)" DataField="UserName" />
+              <asp:BoundField DataField="DomainName" HeaderText="Criteria Type(Domain)" />
+              <asp:BoundField HeaderText="Outcome Type(Intervention)" 
+                  DataField="InterventionName" />
+              <asp:TemplateField HeaderText="Prescribed">
+                  <EditItemTemplate>
+                      <asp:TextBox ID="TextBox1" runat="server" Text='<%# Bind("Prescribed") %>'></asp:TextBox>
+                  </EditItemTemplate>
+                  <ItemTemplate>
+                      <%--<asp:Label ID="Label1" runat="server" Text='<%# Bind("Prescribed") %>'></asp:Label>--%>
+                      <asp:Image ID="PrescribedULR" runat="server" ImageUrl='<%# Eval("PrescribedULR") %>' ImageAlign="Middle" />
+                  </ItemTemplate>
+              </asp:TemplateField>
+              <asp:TemplateField HeaderText="Completed">
+                  <EditItemTemplate>
+                      <asp:TextBox ID="TextBox2" runat="server" Text='<%# Bind("Completed") %>'></asp:TextBox>
+                  </EditItemTemplate>
+                  <ItemTemplate>
+                      <asp:Image ID="CompletedURL" runat="server" ImageUrl='<%# Eval("CompletedURL") %>' ImageAlign="Middle" />
+                  </ItemTemplate>
+              </asp:TemplateField>
+              <asp:TemplateField HeaderText="Email">
+                  <EditItemTemplate>
+                      <asp:TextBox ID="TextBox3" runat="server" Text='<%# Bind("Email") %>'></asp:TextBox>
+                  </EditItemTemplate>
+                  <ItemTemplate>
+                      <asp:Image ID="EmailURL" runat="server" ImageUrl='<%# Eval("EmailURL") %>' ImageAlign="Middle" />
+                  </ItemTemplate>
+              </asp:TemplateField>
+              <asp:TemplateField HeaderText="Telephone">
+                  <EditItemTemplate>
+                      <asp:TextBox ID="TextBox4" runat="server" Text='<%# Bind("Telephone") %>'></asp:TextBox>
+                  </EditItemTemplate>
+                  <ItemTemplate>
+                      <asp:Image ID="TelephoneURL" runat="server" ImageUrl='<%# Eval("TelephoneURL") %>' ImageAlign="Middle" />
+                  </ItemTemplate>
+              </asp:TemplateField>
+              <asp:TemplateField HeaderText="In person">
+                  <EditItemTemplate>
+                      <asp:TextBox ID="TextBox5" runat="server" Text='<%# Bind("InPerson") %>'></asp:TextBox>
+                  </EditItemTemplate>
+                  <ItemTemplate>
+                      <asp:Image ID="InPersonURL" runat="server" ImageUrl='<%# Eval("InPersonURL") %>' ImageAlign="Middle" />
+                  </ItemTemplate>
+              </asp:TemplateField>
+              <asp:TemplateField HeaderText="Hand-Off">
+                  <EditItemTemplate>
+                      <asp:TextBox ID="TextBox6" runat="server" Text='<%# Bind("HandOff") %>'></asp:TextBox>
+                  </EditItemTemplate>
+                  <ItemTemplate>
+                      <asp:Image ID="HandOffURL" runat="server" ImageUrl='<%# Eval("HandOffURL") %>' ImageAlign="Middle" />
+                  </ItemTemplate>
+              </asp:TemplateField>
+              
+              <asp:BoundField HeaderText="Comment" DataField="Comment" />
+          </Columns>
+          <HeaderStyle BackColor="#85B5D9" />
+      </asp:GridView>
+      </div>
+      </div>
+  
+  </td>
+   
+   </tr>
+   </table>
+   </div>
+      
+    
+    <input id="btnPrescrip" type="button" value="Prescribed" align="right" onclick='<%# String.Format("ShowCustomerPopup(\"{0}\");", Eval("StudentID")) %>'/>
+      <%--<asp:LinkButton ID="lnkEdit" Text="Edit" OnClientClick='<%# String.Format("ShowCustomerPopup(\"{0}\");", Eval("StudentID")) %>'
+                            runat="server" CommandName="EditCustomer"></asp:LinkButton> --%>
+</form>
+</body>
+</html>

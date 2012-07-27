@@ -1,0 +1,75 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.IO;
+using System.Data;
+ 
+
+public partial class pg_student_coursereport : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+    }
+    protected void Page_Init(object sender, EventArgs e)
+    {
+        try
+        {
+            string reportOIDStr = Request.QueryString["ReportOID"].ToString();
+            Reports report = null;
+            if (!string.IsNullOrEmpty(reportOIDStr))
+            {
+                report = new Reports().GetReportByOID(Int32.Parse(reportOIDStr));
+            }
+
+            HiddenReportName.Value = report.ReportName;
+            Hiddenquery.Value = report.SPParams;
+            HiddenColumns.Value = report.GridColumns;
+        }
+        catch (Exception ex)
+        { }
+    }
+    protected void ButtonCSV_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            DataTable courseReportDt = Session["CourseReportDt"] as DataTable;
+            string reportOIDStr = Request.QueryString["ReportOID"].ToString();
+
+            ExportToExcel.ExportToSpreadsheet(courseReportDt, reportOIDStr, "CSV");
+
+        }
+        catch (Exception ex)
+        { }
+    }
+    protected void ButtonExcel_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            DataTable courseReportDt = Session["CourseReportDt"] as DataTable;
+            string reportOIDStr = Request.QueryString["ReportOID"].ToString();
+
+            ExportToExcel.ExportToSpreadsheet(courseReportDt, reportOIDStr, "Excel");
+           
+        }
+        catch (Exception ex)
+        { }
+    }
+    protected void ButtonPDF_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            DataTable courseReportDt = Session["CourseReportDt"] as DataTable;
+            string reportOIDStr = Request.QueryString["ReportOID"].ToString();
+
+            ExportToExcel.ExportToSpreadsheet(courseReportDt, reportOIDStr, "PDF");
+
+        }
+        catch (Exception ex)
+        { }
+    }
+
+}

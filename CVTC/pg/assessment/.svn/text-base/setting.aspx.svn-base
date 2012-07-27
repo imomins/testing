@@ -1,0 +1,202 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="setting.aspx.cs" Inherits="pg_assessment_setting" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Setting</title>
+    <script type="text/javascript" src="../../js/jquery.js"></script>
+    <script src="../../js/thickbox.js" type="text/javascript"></script>
+    <link href="../../themes/thickbox.css" rel="stylesheet" type="text/css" />
+    <link href="../../css/global-style.css" rel="stylesheet" type="text/css" />
+    
+  <%--  <script type="text/javascript">
+    $(document).ready(function(){    
+    WWWW
+     $('#ButtonAddRisk').click(function() {
+        $('#AddRisk').show();
+     });
+     
+     $('#ButtonSaveRisk').click(function() {
+        $('#AddRiskSpan').hide();
+        var riskName=$('#TextRiskName').val();
+        $('#TextRiskName').val("");
+        //var newRow='<tr id="'+riskName+'" ><td><span id="spanid'+riskName+'" style="padding:40px;" >'+riskName+': 4pts Flagged+2 Section Failed &nbsp;<input id="ButtonEditAtRisk" type="button" value="edit" />&nbsp;&nbsp; <input id="ButtonPrescription" type="button" value="Prescription" />&nbsp;&nbsp;<span id="SpanInner'+riskName+'" style="display:none;"> Flagged &nbsp;<input id="Flagged'+riskName+'" type="text" style="width:40px"/> &nbsp; Section Failed &nbsp;<input id="SectionFailed'+riskName+'" type="text" style="width:40px"/>&nbsp;<input id="ButtonSaveInner" type="button" value="Save" /></span></span></td></tr>';
+        //var newRow='<tr id="Row" ><td><span id="spanid" style="padding:40px;" >At Risk: 4pts Flagged+2 Section Failed &nbsp;<input id="ButtonEditAtRisk" type="button" value="edit" />&nbsp;&nbsp; <input id="ButtonPrescription" type="button" value="Prescription" />&nbsp;&nbsp;<span id="SpanInner" style="display:none;"> Flagged &nbsp;<input id="Flagged" type="text" style="width:40px"/> &nbsp; Section Failed &nbsp;<input id="SectionFailed" type="text" style="width:40px"/>&nbsp;<input id="ButtonSaveInner" type="button" value="Save" /></span></span></td></tr>';
+        var newRow='<tr id="'+riskName+'"><td><span id="SpanMain'+riskName+'">'+riskName+' : 4pts flagged + 2 Section Failed </span><input id="ButtonEdit" type="button" value="Edit" />  <input id="ButtonPrescription" type="button" value="Prescription" /> <span id="SpanInner'+riskName+'" style="display:none;" > Flagged &nbsp;<input id="Flagged'+riskName+'" style="width:20px" type="text" /> &nbsp; Section Failed &nbsp;<input id="SectionFailed'+riskName+'" type="text" style="width:20px" /><input id="ButtonSave" type="button" value="Save" /> </span></td></tr>';
+        $("#RowLast").before(newRow);
+        alert(riskName);
+        $.ajax({
+            type: "POST",
+            url: "setting.aspx/InsertRiskCalculation",
+            data: "{'RiskName':'"+riskName+"'}",
+            contentType: "application/json; charset=utf-8",
+             dataType: "json",
+             async: true,
+             cache: false,
+             success: function(msg) {
+             alert(msg.d);   
+            }
+        });
+        
+     });
+     
+     $('#ButtonAddRisk').click(function() {
+        $('#AddRiskSpan').show();
+        });
+        
+        
+     $("#ButtonEdit").live('click', function() { 
+        var riskName = ($(this).closest('tr').attr('id'));       
+        $('#SpanInner'+riskName).show();
+     });
+     
+     $('#ButtonSave').live('click', function() {
+        
+        var riskName = ($(this).closest('tr').attr('id'));       
+        $('#SpanInner'+riskName).hide();
+        var flg=$('#Flagged'+riskName).val();
+        var sfail=$('#SectionFailed'+riskName).val();
+        var txt=riskName+ ' : '+flg+' pts flagged  + '+sfail+' Sections Failed';        
+        $('#SpanMain'+riskName).text(txt);
+        
+     });
+    
+    });
+    </script>--%>
+    
+    <script type="text/javascript">
+    $(document).ready(function(){
+     $('#ButtonPrescription').live('click', function() {
+         var oid = ($(this).closest('tr').attr('id'));  
+         
+         var tmp = $("#popupid").attr("href");
+         tmp = tmp.substring(0, 18) + "OID=" + oid + "&" + tmp.substring(19, tmp.length);
+                    
+         $("#popupid").attr("href", tmp);
+         $("#popupid").click();
+        });
+    });
+    
+    </script>
+</head>
+<body>
+
+    <form id="form1" runat="server">
+    <asp:HiddenField ID="HiddenFieldCurrentUser" runat="server" />
+<asp:HiddenField ID="HiddenFieldAOID" runat="server" />
+    <a href="prescription.aspx?keepThis=true&TB_iframe=true&height=400&width=550" class="thickbox" id="popupid" style="display:none;" >Dislay</a>
+    <table style="padding:5px">
+    <tr><td>
+    <table >
+    <tr ><td colspan="2">
+        <asp:Label ID="LabelAssessmentName" runat="server" Text=""></asp:Label></td></tr>
+    <tr><td colspan="2"><asp:Label ID="lblULR" runat="server" Text="" ></asp:Label></td></tr>
+    <tr><td colspan="2">&nbsp;</td></tr>
+        <tr><td>Total Questions:</td><td>
+            <asp:Label ID="LabelTotalQuestion" runat="server" Text=""></asp:Label></td></tr>
+        <tr style="display:none;"><td>Total Flagged:</td><td><asp:Label ID="LabelTotalFlagged" runat="server" Text=""></asp:Label></td></tr>
+        <tr style="display:none;"><td>Flagged Point Total:</td><td><asp:Label ID="LabelFlaggedPoint" runat="server" Text=""></asp:Label></td></tr>
+        <tr><td>Sections:</td><td><asp:Label ID="LabelSection" runat="server" Text=""></asp:Label></td></tr>
+        <tr><td colspan="2"><span><asp:Label ID="LabelSectionDetails" runat="server" Text=""></asp:Label></span></td></tr>        
+    </table>
+    </td></tr>
+    <tr><td >
+        <asp:Label ID="LabelRisk" runat="server" Text="Label"></asp:Label>
+    <%--<table id="tblRisk" style="border-style: solid; border-width: thin">
+  <tr><td>At Risk Calculation</td></tr>
+  <tr><td>Current Calculation(s): <input id="ButtonAddRisk" type="button" value="+" /> <span id="AddRiskSpan" style="display:none;">Name <input id="TextRiskName" type="text" /> 
+      <input id="ButtonSaveRisk" type="button" value="Save" /></span></td></tr>
+  
+  <tr id="1" style="display:none;"><td><span id="SpanMain1">At Risk : 4pts flagged + 2 Section Failed </span><input id="ButtonEdit" type="button" value="Edit" />  <input id="ButtonPrescription" type="button" value="Prescription" /> <span id="SpanInner1" style="display:none;"> Flagged &nbsp;<input id="Flagged1" style="width:20px" type="text" /> &nbsp; Section Failed &nbsp;<input id="SectionFailed1" type="text" style="width:20px" /><input id="ButtonSave" type="button" value="Save" /> </span></td></tr>
+  
+  <tr id="RowLast"><td>&nbsp;</td></tr>
+  </table>--%>
+  
+  </td></tr>
+  </table>
+    
+    </form>
+    
+      <script type="text/javascript">
+    $(document).ready(function(){    
+    
+     $('#ButtonAddRisk').click(function() {
+        $('#AddRisk').show();
+     });
+     
+     $('#ButtonSaveRisk').click(function() {
+        $('#AddRiskSpan').hide();
+        var riskName=$('#TextRiskName').val();
+        $('#TextRiskName').val("");
+        if(riskName.length==0) 
+        {
+        alert("Please input risk name.");
+        return;
+        }
+        //var newRow='<tr id="'+riskName+'" ><td><span id="spanid'+riskName+'" style="padding:40px;" >'+riskName+': 4pts Flagged+2 Section Failed &nbsp;<input id="ButtonEditAtRisk" type="button" value="edit" />&nbsp;&nbsp; <input id="ButtonPrescription" type="button" value="Prescription" />&nbsp;&nbsp;<span id="SpanInner'+riskName+'" style="display:none;"> Flagged &nbsp;<input id="Flagged'+riskName+'" type="text" style="width:40px"/> &nbsp; Section Failed &nbsp;<input id="SectionFailed'+riskName+'" type="text" style="width:40px"/>&nbsp;<input id="ButtonSaveInner" type="button" value="Save" /></span></span></td></tr>';
+        //var newRow='<tr id="Row" ><td><span id="spanid" style="padding:40px;" >At Risk: 4pts Flagged+2 Section Failed &nbsp;<input id="ButtonEditAtRisk" type="button" value="edit" />&nbsp;&nbsp; <input id="ButtonPrescription" type="button" value="Prescription" />&nbsp;&nbsp;<span id="SpanInner" style="display:none;"> Flagged &nbsp;<input id="Flagged" type="text" style="width:40px"/> &nbsp; Section Failed &nbsp;<input id="SectionFailed" type="text" style="width:40px"/>&nbsp;<input id="ButtonSaveInner" type="button" value="Save" /></span></span></td></tr>';
+        //var newRow='<tr id="'+riskName+'"><td><span id="SpanMain'+riskName+'">'+riskName+' : 4pts flagged + 2 Section Failed </span><input id="ButtonEdit" type="button" value="Edit" />  <input id="ButtonPrescription" type="button" value="Prescription" /> <span id="SpanInner'+riskName+'" style="display:none;" > Flagged &nbsp;<input id="Flagged'+riskName+'" style="width:20px" type="text" /> &nbsp; Section Failed &nbsp;<input id="SectionFailed'+riskName+'" type="text" style="width:20px" /><input id="ButtonSave" type="button" value="Save" /> </span></td></tr>';        
+        var uoid = $('#<%=HiddenFieldCurrentUser.ClientID %>').val();
+        var aoid = $('#<%=HiddenFieldAOID.ClientID %>').val();
+       // alert(uoid);
+        //alert(aoid);
+        $.ajax({
+            type: "POST",
+            url: "setting.aspx/InsertRiskCalculation",
+            data: "{'RiskName':'"+riskName+"','aoid':'"+aoid+"','userid':'"+uoid+"' }",
+            contentType: "application/json; charset=utf-8",
+             dataType: "json",
+             async: true,
+             cache: false,
+             success: function(msg) {
+             var newRow='<tr id="'+msg.d+'"><td><span>'+riskName+'</span><span id="SpanMain'+msg.d+'"> : 0 Flag Point  </span><input id="ButtonEdit" type="button" value="Edit" />  <input id="ButtonPrescription" type="button" value="Prescription" /> <span id="SpanInner'+msg.d+'" style="display:none;" > Flagged &nbsp;<input id="Flagged'+msg.d+'" style="width:20px" type="text" /> &nbsp;  &nbsp;<input id="ButtonSave" type="button" value="Save" /> </span></td></tr>';
+             $("#RowLast").before(newRow);
+             //alert(msg.d);   
+            }
+        });
+
+        
+     });
+     
+     $('#ButtonAddRisk').click(function() {
+        $('#AddRiskSpan').show();
+        });
+        
+        
+     $("#ButtonEdit").live('click', function() { 
+        var riskName = ($(this).closest('tr').attr('id'));       
+        $('#SpanInner'+riskName).show();
+     });
+     
+     $('#ButtonSave').live('click', function() {
+        
+        var riskName = ($(this).closest('tr').attr('id'));       
+        $('#SpanInner'+riskName).hide();
+        var flg=$('#Flagged'+riskName).val();
+        var sfail=0;
+        //var sfail=$('#SectionFailed'+riskName).val();
+        var txt= ' : '+flg+' Flagged Point ';        //+sfail+' Sections Failed'
+        $('#SpanMain'+riskName).text(txt);
+        
+        //Save to Database using ajax
+        $.ajax({
+        type: "POST",
+            url: "setting.aspx/EditRiskCalculation",
+            data: "{'oid':'"+riskName+"', 'flag': '"+flg+"', 'section':'"+sfail+"'}",
+            contentType: "application/json; charset=utf-8",
+             dataType: "json",
+             async: true,
+             cache: false,
+             success: function(msg) {             
+             //Save successfully
+             
+            }
+        });
+        
+     });
+    
+    });
+    </script>
+</body>
+</html>

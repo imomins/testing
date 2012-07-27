@@ -1,0 +1,1 @@
+﻿<%@ Page Language="C#" Buffer="False" ValidateRequest="false" AutoEventWireup="true" CodeFile="PrintResultLetter.aspx.cs" Inherits="pg_assessment_PrintResultLetter" %>

@@ -1,0 +1,74 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.Security;
+
+public partial class login : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if(!Page.IsPostBack)
+        {
+            Session.Clear();
+        }
+    }
+
+    private bool Validation()
+    {
+        bool result = false;
+        if (TextBoxPassword.Text == "" || TextBoxUserName.Text == "")
+        {
+            result = false;
+        }
+        else
+        {
+            result = true;
+        }
+        return result;
+    }
+    
+    protected void ButtonLogin_Click(object sender, EventArgs e)
+    {
+
+        if (Validation())
+        {
+            User user = new User();
+            string freez = "Yes";
+            freez = user.GetUserFreezByUserName(TextBoxUserName.Text);
+            user = user.GetUserByNameAndPassword(TextBoxUserName.Text, TextBoxPassword.Text);
+
+            if (user != null && freez != "No")
+            {
+                if (TextBoxPassword.Text == user.Password && TextBoxUserName.Text == user.UserName)
+                {
+                    Session.Clear();
+                    Session["CurrentUser"] = user;
+                    FormsAuthentication.RedirectFromLoginPage(this.TextBoxUserName.Text, false);
+                    //Response.Redirect("Default.aspx");
+                }
+            }
+            else if (user == null)
+                {
+                    LabelStatus.Text = "Login Fail";
+                }
+            else if (freez == "No")
+            {
+                LabelStatus.Text = "User has been Freezed";
+            }
+            else
+            {
+                LabelStatus.Text = "Login Fail";
+            }
+        }
+        else
+        {
+            LabelStatus.Text = "Login Fail";
+        }
+        
+    }
+
+    
+}

@@ -1,0 +1,85 @@
+﻿div.dt
+{
+	border: groove 1px #9C9C9C;
+	vertical-align: middle;
+	background-color: White;	
+}
+div.dt:hover
+{
+	border: groove 1px green;
+	vertical-align: middle;
+	background-color: White;
+}
+div.dvmain
+{
+	border: groove 1px #9C9C9C;
+	display: none;
+	scrollbar-face-color: white; 
+	margin: 0px;
+	scrollbar-highlight-color: whitesmoke;
+	overflow: auto;
+	scrollbar-arrow-color: black;
+	scrollbar-track-color: white;
+	scrollbar-darkshadow-color: whitesmoke;
+	background-color: White;
+	font-family: Arial;
+	font-size: 12px;
+}
+div.dvmain table tr:hover
+{
+	background-color: #CFC996;
+}
+input.dda
+{
+	vertical-align: top;
+	cursor: hand;
+	height: 18px;
+	width: 18px;	
+}
+input.mstbm
+{
+	border: none 1px; 
+	height: 17px;
+	color: black;	
+	vertical-align: top;
+	font-family: Arial;
+	font-size: 12px;
+}
+input.mstbm span
+{
+	display: none;
+	position: absolute;
+	top: 20px;
+	left: -10px;
+	width: 125px;
+	padding: 5px;
+	z-index: 100;
+	background: #000;
+	color: #fff;
+	-moz-border-radius: 5px; /* this works only in camino/firefox */
+	-webkit-border-radius: 5px; /* this is just for Safari */
+}
+input.mstbm:hover span
+{
+	display: block;
+}
+img.nicheimage
+{
+	margin-left: 25px;
+	margin-top: 51px;
+	position: absolute;
+	top: -10px;
+}
+div.selectall
+{
+	cursor: pointer; 
+	border-left: 1px solid #9C9C9C;
+	border-top: 1px solid #9C9C9C;
+	border-bottom: 1px solid #9C9C9C;
+	border-right: 0px;
+	cursor: hand; 
+	float: left; 
+	background-image: url('../Images/check.png'); 
+	width: 20px; 
+	height: 20px;
+}

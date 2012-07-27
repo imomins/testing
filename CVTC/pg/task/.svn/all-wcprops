@@ -1,0 +1,101 @@
+K 25
+svn:wc:ra_dav:version-url
+V 35
+/svn/cvtc/!svn/ver/92/trunk/pg/task
+END
+temp.aspx
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/cvtc/!svn/ver/2/trunk/pg/task/temp.aspx
+END
+temp.aspx.cs
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/cvtc/!svn/ver/2/trunk/pg/task/temp.aspx.cs
+END
+newTask.aspx
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/cvtc/!svn/ver/88/trunk/pg/task/newTask.aspx
+END
+test.aspx
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/cvtc/!svn/ver/2/trunk/pg/task/test.aspx
+END
+newTask.aspx.cs
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/cvtc/!svn/ver/88/trunk/pg/task/newTask.aspx.cs
+END
+test.aspx.cs
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/cvtc/!svn/ver/2/trunk/pg/task/test.aspx.cs
+END
+DisplayTask.aspx
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/cvtc/!svn/ver/9/trunk/pg/task/DisplayTask.aspx
+END
+TaskHandler.ashx
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/cvtc/!svn/ver/27/trunk/pg/task/TaskHandler.ashx
+END
+DisplayTask.aspx.cs
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/cvtc/!svn/ver/9/trunk/pg/task/DisplayTask.aspx.cs
+END
+taskSent.aspx
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/cvtc/!svn/ver/88/trunk/pg/task/taskSent.aspx
+END
+ViewTask.aspx
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/cvtc/!svn/ver/88/trunk/pg/task/ViewTask.aspx
+END
+TaskCompleted.aspx
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/cvtc/!svn/ver/88/trunk/pg/task/TaskCompleted.aspx
+END
+taskSent.aspx.cs
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/cvtc/!svn/ver/88/trunk/pg/task/taskSent.aspx.cs
+END
+ViewTask.aspx.cs
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/cvtc/!svn/ver/88/trunk/pg/task/ViewTask.aspx.cs
+END
+TaskCompleted.aspx.cs
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/cvtc/!svn/ver/88/trunk/pg/task/TaskCompleted.aspx.cs
+END
+UserHandler.ashx
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/cvtc/!svn/ver/92/trunk/pg/task/UserHandler.ashx
+END

@@ -1,0 +1,83 @@
+﻿H1
+{
+	font-size: medium;
+	color: #4A3C8C;
+	font-family: Arial;
+}
+
+.Grid
+{
+	background: url( "images/ui-bg_inset-hard_100_fcfdfd_1x100.png" ) repeat-x scroll 50% bottom #FCFDFD;
+	border: 1px solid #A6C9E2;
+	font-family: Lucida Grande,Lucida Sans,Arial,sans-serif;
+	font-size: 1.1em;
+	color: #222222;
+	font-size: 11px;
+}
+
+.Grid td
+{
+	border-bottom-color: inherit;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	font-weight: normal;
+	height: 22px;
+	overflow: hidden;
+	padding: 0 2px;
+	white-space: pre;
+	white-space: normal !important;
+}
+
+.GridHeader
+{
+	font-weight: bold;
+	color: #F7F7F7;
+	background-color: #4A3C8C;
+}
+ 
+
+.GridHeader a:hover
+{
+	text-decoration: underline;
+	background: #4A3C8C url(images/spin.gif) no-repeat 0 100%;
+}
+
+.GridItem, .GridAltItem
+{
+	font-size: smaller;
+	color: #4A3C8C;
+}
+
+.GridItem
+{
+	background-color: #E7E7FF;
+}
+
+.GridAltItem
+{
+	background-color: #F7F7F7;
+}
+
+.GridPager
+{
+    border-bottom: 0 none !important;
+    border-left: 0 none !important;
+    border-right: 0 none !important;
+    height: 25px;
+    margin: 0 !important;
+    overflow: hidden;
+    padding: 0 !important;
+    position: relative;
+    white-space: nowrap;
+}
+
+
+
+
+
+
+
+
+
+
+

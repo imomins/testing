@@ -1,0 +1,153 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="QuestionSheet.aspx.cs" Inherits="pg_answer_QuestionSheet" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Untitled Page</title>
+    
+ <style type="text/css">
+     
+     .table_border  tr td { border:1px solid #999;}
+     .answer_table {border:1px solid #d7d7d7; }
+     .answer_table tr td {border:1px solid #d7d7d7; }
+.answer {
+
+width:10px;
+color:#333;
+border:0px solid red;
+writing-mode:tb-lr;
+-webkit-transform:rotate(90deg);
+-moz-transform:rotate(90deg);
+-o-transform: rotate(90deg);
+white-space:nowrap;
+display:block;
+margin:0px;
+padding :0px;
+margin-bottom:100px;
+margin-left:0px;
+float:right;
+position:relative;
+text-align:center;
+vertical-align:top;
+padding-right:8px;
+clear:both;
+
+
+}
+.qustion_title_bg { background:#d7d7d7; padding:5px; margin:5px; width:350px;}   
+   .qustion_title_bg_alt { background:#fff; padding:5px; margin:5px; width:350px;}
+    </style>
+    
+     
+</head>
+    <body>
+    <form id="form1" runat="server">
+    <table style="width:100%; padding-left:5px;">    
+ <%--   <tr style="background:#85B5D9"><td>
+        <asp:Label ID="LabelAssessment" runat="server" Text="Label"></asp:Label></td></tr>       
+       <tr><td>&nbsp;</td></tr>--%>
+       <tr>
+       <td>
+           <table width="100%" style=" border:1px solid #999999;" class="table_border" cellpadding="8" cellspacing="0">
+       <tr>
+     <td width="40%" colspan="2" style="background:#999999;" class="style1">
+         <span style=" color:#fff;">CVTC INVENTORY OF STUDENT SUCCESS</span>
+     </td>
+     <td width="25%" align="center" style="background:#d7d7d7;" class="style2">
+         <b>First Name</b></td> 
+     <td width="25%" align="center" style="background:#d7d7d7;" class="style2">
+         <b>Last Name</b></td>
+     </tr>
+     
+       <tr>
+     <td align="right" style="background:#d7d7d7;">
+         <b>StudentID :</b></td>
+     <td>
+         <asp:Label ID="lblStudentID" runat="server" Text="Label" 
+             style="font-weight: 700"></asp:Label>
+     </td>
+     <td align="center" >
+         <asp:Label ID="lblFirstName" runat="server" Text="Label" 
+             style="font-weight: 700"></asp:Label>
+     </td>
+     <td width="25%" align="center">
+         <asp:Label ID="lblLastName" runat="server" Text="Label" 
+             style="font-weight: 700"></asp:Label>
+     </td>   
+     </tr>
+     
+       <tr>
+     <td align="right" style="background:#d7d7d7;" >
+         <b>Program Applying For:</b></td>
+     <td >
+         <asp:Label ID="lblProgram" runat="server" Text="Label" style="font-weight: 700"></asp:Label>
+     </td>
+     <td align="right" style="background:#d7d7d7;">
+         <b>Birth Date :</b></td>
+     <td width="25%">
+         <asp:Label ID="lblBirthDate" runat="server" Text="Label" 
+             style="font-weight: 700"></asp:Label>
+     </td>
+ 
+     </tr>
+     
+     </table>
+     <br />
+       </td>
+       
+       </tr>
+       
+       <tr>
+       <td>
+          <div id ="Title" >
+     The inventory provides an important private communication channel between you and CVTC. It records your 
+thoughts and feelings on many issues related to college.  Results for your class as a whole will be used to plan 
+campus-wide programs of support services. Staff members will determine how much need exists for certain types 
+of services and how these services can be best provided.  Please darken in one response circle for each item.  Use 
+a pencil so you can erase to change a response, if needed.
+     </div>
+     <br/>
+
+       </td>
+       </tr>
+       <tr>
+       
+       <td>
+         <asp:PlaceHolder ID="PlaceHolderMain" runat="server"></asp:PlaceHolder>
+       </td></tr>
+    <%--   <tr>
+       <td>
+       <asp:Literal ID ="Literal1" runat ="server" ></asp:Literal>
+           <br />
+           <br />
+           <br />
+       </td>
+       </tr>
+       <tr>
+       <td >
+       <asp:Literal ID ="Literal2" runat ="server" ></asp:Literal>
+       </td>
+       </tr>--%>
+       <tr>
+       <td>
+       <div id ="divSoreTable" runat ="server" ></div>
+       </td>
+       </tr>
+       
+       
+       <tr>
+        <td>
+       <div id ="divNonScoreTable"  runat ="server" ></div>
+       </td>
+       </tr>
+       
+       <tr><td><asp:Button ID="ButtonSubmit" runat="server" Text="Submit" 
+               onclick="ButtonSubmit_Click" />&nbsp;<asp:Label ID="lblValidation" 
+               runat="server" ForeColor="#FF3300"></asp:Label>
+           </td></tr>
+    </table>
+    </form>
+    
+</body>
+</html>

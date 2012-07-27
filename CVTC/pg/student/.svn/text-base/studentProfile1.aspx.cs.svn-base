@@ -1,0 +1,315 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using System.Data.SqlClient;
+
+public partial class pg_student_studentProfile : System.Web.UI.Page
+{
+
+    public string getID;
+    
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!Page.IsPostBack)
+        {
+            string strID = null;
+            if (Request.QueryString["id"] != null)
+            {
+               strID = Request.QueryString["id"].ToString();
+               ViewState["STDOID"] = strID;
+            }
+            populateDropdownList();
+            Student stu = new Student();
+            string strOID = stu.GetStudentIDByStudentBannerOID(Convert.ToInt32(strID));
+            Populate(strOID);
+            PopulateSection(ddlAssesment.Text.ToString(), Convert.ToInt32(strID));
+            PopulateSectionNoScore(ddlAssesment.Text.ToString(), Convert.ToInt32(strID));
+            PopulateCourseByStudentID();
+            PopulateGridIntervention();
+        }
+        
+    }
+
+    protected void ButtonRefresh_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            string strID = null;
+            strID=ViewState["STDOID"].ToString() ;
+            populateDropdownList();
+            Student stu = new Student();
+            string strOID = stu.GetStudentIDByStudentBannerOID(Convert.ToInt32(strID));
+            Populate(strOID);
+            PopulateSection(ddlAssesment.Text.ToString(), Convert.ToInt32(strID));
+            PopulateSectionNoScore(ddlAssesment.Text.ToString(), Convert.ToInt32(strID));
+            PopulateCourseByStudentID();
+            PopulateGridIntervention();
+        }
+        catch (Exception ex)
+        { }
+    }
+    private void populateDropdownList()
+    {
+        Assessment As = new Assessment();
+        ddlAssesment.DataSource = As.GetAllAssessmnet();
+        ddlAssesment.DataBind();
+    }
+
+    
+    private void Populate(string strID)
+    {
+       
+        Student stu = new Student();
+        stu.GetStudentByStudentOID(strID);
+        lblStudentName.Text = stu.FullName;
+        lblID.Text = stu.StudentID;
+        Session["StudentID"] = lblID.Text.ToString();
+        getID = lblID.Text;
+        lblTelephone.Text = stu.HomeTelephoneNumber;
+        lblCumulativeGPA.Text = stu.CumulativeGPA.ToString ();
+        lblCreditAttempted.Text = stu.CreditAttempted.ToString ();
+        lblCreditEarned.Text = stu.CreditEarned.ToString ();
+        lblHSname.Text = stu.HighSchoolName;
+        lblgraddate.Text = stu.HighSchoolGraduationDate.ToShortDateString ();
+        lblacte.Text = stu.EnglishAssessmentScore;
+        lblactm.Text = stu.MathAssessmentScore;
+        lblactr.Text = stu.ReadingAssessmentScore;
+        lblacts.Text = stu.ScienceAssessmentScore;
+        lblalgebra.Text = stu.CompassalgebraTestScore;
+        lblprealgebra.Text = stu.PrealgebraTestScore;
+        lblreading.Text = stu.CompassReadingTestScore;
+        lblwritting.Text = stu.CompassWrittingTestScore;
+        lblPreProgram.Text = stu.PreprogramIndicator;
+        LabelMC.Text = "Multicultural";//(stu.MC == "0") ? "" : stu.MC;
+        if (stu.MC != "0")
+        {
+            LabelMC.ForeColor = System.Drawing.Color.Red;
+        }
+        else
+        {
+            LabelMC.ForeColor = System.Drawing.Color.Black;
+        }
+        LabelNTO.Text = "NTO";//(stu.NTO == "0") ? "" : stu.NTO;
+        if (stu.NTO != "0")
+        {
+            LabelNTO.ForeColor = System.Drawing.Color.Red;
+        }
+        else
+        {
+            LabelNTO.ForeColor = System.Drawing.Color.Black;
+        }
+        LabelAllert.Text = "Allert";//(stu.ALLERT == "0") ? "" : stu.ALLERT;
+        if (stu.ALLERT != "0")
+        {
+
+            LabelAllert.ForeColor = System.Drawing.Color.Red;
+        }
+        else
+        {
+            LabelAllert.ForeColor = System.Drawing.Color.Black;
+        }
+        LabelPell.Text = "PELL";//(stu.PELL == "0") ? "" : stu.PELL;
+        if (stu.PELL != "0")
+        {
+            LabelPell.ForeColor = System.Drawing.Color.Red;
+        }
+        else
+        {
+            LabelPell.ForeColor = System.Drawing.Color.Black;
+        }
+        LabelRVP.Text = "RVP";//(stu.RVP == "0") ? "" : stu.RVP;
+        if (stu.RVP != "0")
+        {
+            LabelRVP.ForeColor = System.Drawing.Color.Red;
+        }
+        else
+        {
+            LabelRVP.ForeColor = System.Drawing.Color.Black;
+        }
+        
+    }
+
+    private void PopulateCourseByStudentID()
+    {
+        Course course = new Course();
+        string id = lblID.Text.Trim();
+        CourseGrid.DataSource = course.GetCourseByStudentOID(id);
+        CourseGrid.DataBind();
+    }
+    
+
+    private void PopulateSectionNoScore(string strname,int StudentOID)
+    {
+        int AssessmentOID;
+        Sections section = new Sections();
+        AssessmentOID = section.GetAssessmentOIDByAssessmentName(strname);
+        //GridViewSection.DataSource = section.GetSectionsByAssessmentOID(AssessmentOID);
+        GridViewScore.DataSource = section.GetSectionsWithNoScore(AssessmentOID, StudentOID);
+        GridViewScore.DataBind();
+           
+    }
+    private void PopulateSection(string strname,int StudentOID)
+    {
+        int AssessmentOID;
+        Sections section = new Sections();
+        AssessmentOID = section.GetAssessmentOIDByAssessmentName(strname);
+        //GridViewSection.DataSource = section.GetSectionsByAssessmentOID(AssessmentOID);
+        GridViewSection.DataSource = section.GetSectionsWithScoreByAOID(AssessmentOID, StudentOID);        
+        GridViewSection.DataBind();
+           
+    }
+
+    private void PopulateGridIntervention()
+    {
+        Interventions inv = new Interventions();
+        Student stu = new Student();
+        int i = stu.GetStudentOIDByStudentBannerID(lblID.Text.ToString());
+        GridViewIntervention.DataSource = inv.GetInterventionByStudentOID(i, "1", "10");
+        GridViewIntervention.DataBind();
+    }
+
+    protected void FormView1_PageIndexChanging(object sender, FormViewPageEventArgs e)
+    {
+    }
+
+    protected void DropDownList1_SelectedIndexChanged(object sender, EventArgs e)
+    {
+       
+       
+     
+    }
+   
+    protected void FormView1_DataBound(object sender, EventArgs e)
+    {
+        
+    }
+
+    protected void ddlAssesment_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        try
+        {
+            int stdOID = (int)ViewState["STDOID"];
+            string strSectionName = null;
+            strSectionName = ddlAssesment.SelectedItem.ToString();
+            PopulateSection(strSectionName, stdOID);
+            PopulateSectionNoScore(ddlAssesment.Text.ToString(), stdOID);
+        }
+        catch (Exception ex)
+        { }
+        
+    }
+
+    protected void CourseGrid_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+
+        CourseGrid.PageIndex = e.NewPageIndex;
+        PopulateCourseByStudentID();
+    }
+    protected void GridViewIntervention_SelectedIndexChanging(object sender, GridViewSelectEventArgs e)
+    {
+
+    }
+
+    protected void GridViewIntervention_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        GridViewIntervention.PageIndex = e.NewPageIndex;
+        PopulateGridIntervention();
+    }
+    protected void lbtnNext_Click(object sender, EventArgs e)
+    {
+        lbtnPrev.Enabled = true;
+        Student stu = new Student();
+        int stdOID = Next();
+        string strID = stu.GetStudentIDByStudentBannerOID(stdOID);
+        
+        if (strID == "" || strID == null)
+        {
+            lbtnNext.Enabled = false;
+        }
+        else
+        {
+            Populate(strID);
+            PopulateCourseByStudentID();
+            PopulateGridIntervention();
+            PopulateSectionNoScore(ddlAssesment.Text.ToString(), stdOID);
+            PopulateSection(ddlAssesment.Text.ToString(), stdOID);
+        }
+    }
+
+    private int  Next()
+    {
+        Student stu = new Student();
+        int i = stu.GetStudentOIDByStudentBannerID(lblID.Text.ToString());
+        i = i + 1;
+        return i;
+    }
+
+    protected void ddlAssesment_SelectedIndexChanged1(object sender, EventArgs e)
+    {
+
+    }
+    protected void ddlAssesment_SelectedIndexChanged2(object sender, EventArgs e)
+    {
+
+    }
+    protected void lbtnPrev_Click(object sender, EventArgs e)
+    {
+        Session["StudentID"] = lblID.Text.ToString();
+        lbtnNext.Enabled = true ;
+        Student stu = new Student();
+        int OID = Prev();
+        string strID = stu.GetStudentIDByStudentBannerOID(OID);
+        if (strID == ""||strID ==null)
+        {
+            lbtnPrev.Enabled = false;
+
+        }
+        else
+        {
+            Populate(strID);
+            PopulateCourseByStudentID();
+            PopulateGridIntervention();
+            PopulateSectionNoScore(ddlAssesment.Text.ToString(), OID);
+            PopulateSection(ddlAssesment.Text.ToString(), OID);
+        }
+    }
+
+    private int Prev()
+    {
+        Student stu = new Student();
+        int i = stu.GetStudentOIDByStudentBannerID(lblID.Text.ToString());
+        if (i > 0)
+        {
+            i = i - 1;
+        }
+        else
+        {
+            i = 1;
+        }
+        return i;
+    }
+    protected void btnPrescribed_Click(object sender, EventArgs e)
+    {
+
+    }
+    protected void CourseGrid_SelectedIndexChanged(object sender, EventArgs e)
+    {
+
+    }
+    protected void GridViewSection_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        try
+        {
+            int stdOID = (int)ViewState["STDOID"];
+            GridViewSection.PageIndex = e.NewPageIndex;
+            PopulateSection(ddlAssesment.Text.ToString(), stdOID);
+            PopulateSectionNoScore(ddlAssesment.Text.ToString(), stdOID);
+        }
+        catch (Exception ex)
+        { }
+    }
+}

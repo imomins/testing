@@ -1,0 +1,49 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="DisplayTask.aspx.cs" Inherits="pg_task_DisplayTask" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <table style="width: 100%;">
+        <tr>
+            <td>
+              <span style="color:Navy; font-weight:bold;" > Completion Date and Time :</span> &nbsp;&nbsp;<asp:Label ID="LabelCompletionDateTime" runat="server" Text="Label"></asp:Label>
+               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:Navy; font-weight:bold;" >Priority : </span>&nbsp;&nbsp;<asp:Label ID="LabelPriority" runat="server" Text="Label"></asp:Label>
+            </td>
+            
+        </tr>
+        <tr>
+            <td>
+             <span style="color:Navy; font-weight:bold;" >   To</span> &nbsp;&nbsp;&nbsp;<asp:Label ID="LabelTo" runat="server" Text="Label"></asp:Label>
+            </td>
+            
+        </tr>
+        <tr>
+            <td>
+              <span style="color:Navy; font-weight:bold;" > Tittle </span>&nbsp;&nbsp;&nbsp;<asp:Label ID="LabelTittle" runat="server" Text="Label"></asp:Label>
+            </td>
+            
+        </tr>
+        <tr>
+            <td>
+              <span style="color:Navy; font-weight:bold;" > Message</span>
+            </td>
+            
+        </tr>
+        <tr>
+            <td>
+                <asp:TextBox ID="TextBoxMessage" ReadOnly="false" runat="server" Rows="10" 
+                    TextMode="MultiLine" Width="557px" Height="267px" 
+                    ontextchanged="TextBoxMessage_TextChanged" ></asp:TextBox>                                        
+            </td>
+            
+        </tr>
+        
+    </table>
+    </form>
+</body>
+</html>

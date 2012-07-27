@@ -1,0 +1,52 @@
+﻿<%@ WebHandler Language="C#" Class="Result" %>
+
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Data.SqlClient;
+using System.Web;
+using System.Web.Script.Serialization;
+using System.Data.Odbc;
+
+public class Result : IHttpHandler {
+    
+    public void ProcessRequest (HttpContext context) 
+    {
+        //context.Response.ContentType = "text/plain";
+        //context.Response.Write("Hello World");
+        //connectionString = System.Web.Configuration.WebConfigurationManager.AppSettings["ConnectionString"].ToString();
+
+        HttpRequest request = context.Request;
+        HttpResponse response = context.Response;
+
+        string _search = request["_search"];
+        string numberOfRows = request["rows"];
+        string pageIndex = request["page"];
+        string sortColumnName = request["sidx"];
+        string sortOrderBy = request["sord"];
+        string operation = request["oper"];
+        string field = request["searchField"];
+        string val = request["searchString"];
+        string clList = "";
+        int aid = Convert.ToInt32(request["aid"]);
+        int totalRecords;
+
+ 
+        //string str2 = request.QueryString.ToString();
+        //string str3 = request.RawUrl.ToString();
+        //string str4 = request.Url.ToString();
+ 
+        
+        //Assessment ass=new Assessment();
+        //string output = ass.GetAssessmentResult(aid, numberOfRows, pageIndex, out totalRecords, sortColumnName, sortOrderBy);
+        //response.Write(output);
+    }
+ 
+    public bool IsReusable {
+        get {
+            return false;
+        }
+    }
+
+}
